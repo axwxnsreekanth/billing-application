@@ -6,6 +6,9 @@ import urls from "../services/urls";
 import { useState, useEffect } from "react";
 import { InputDialog } from "../components";
 import { useToast } from "../components/Popup/ToastProvider";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function VehicleMake() {
     const { showToast } = useToast();
@@ -16,7 +19,7 @@ function VehicleMake() {
         try {
             const { data } = await api.get(`${urls.checkDuplicateMake}?Make=${make}`);
             if (data.exists) {
-                showToast("Make Already Exists","error")
+                showToast("Make Already Exists", "error")
             }
             else {
                 try {
@@ -24,11 +27,11 @@ function VehicleMake() {
                         Make: make,
                         Type: 1
                     });
-                    showToast("Make Added","success")
+                    showToast("Make Added", "success")
                     getAllMakes();
                 }
                 catch (err) {
-                    showToast("Error Occured","error")
+                    showToast("Error Occured", "error")
                     console.error(err)
                 }
             }
@@ -107,6 +110,14 @@ function VehicleMake() {
                                         <TableRow key={index}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{details.Make}</TableCell>
+                                            <TableCell>
+                                                <IconButton >
+                                                    <EditIcon color="primary" />
+                                                </IconButton>
+                                                <IconButton >
+                                                    <DeleteIcon color="error" />
+                                                </IconButton>
+                                            </TableCell>
                                         </TableRow>
                                     ))
                                 )
