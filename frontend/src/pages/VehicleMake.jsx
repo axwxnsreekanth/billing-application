@@ -9,25 +9,67 @@ import { useToast } from "../components/Popup/ToastProvider";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { ConfirmDialog } from "../components";
 
 function VehicleMake() {
     const { showToast } = useToast();
     const [makeList, setMakeList] = useState([])
     const [make, setMake] = useState('');
     const [open, setOpen] = useState(false);
+    const [newMake, setNewMake] = useState('');
+    const [newMakeID, setNewMakeID] = useState(0);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [deleteID,setDeleteID]=useState(0);
+    const handleDelete = async() => {
+        try{
+            if(deleteID!=0){
+                const {data}=await api.delete(`${urls.deleteMake}?id=${deleteID}`)
+                if(data==="Make deleted"){
+                     showToast("Make Deleted", "success")
+                     getAllMakes();
+                }
+            }
+        }
+        catch(err){
+            console.error(err)
+        }
+        finally{
+        setOpenDialog(false);
+        }
+    };
+    const handleDeleteClick=(id)=>{
+        setDeleteID(id);
+        setOpenDialog(true)
+    }
     const handleAddMake = async (make) => {
         try {
+            if (newMake !== "") {
+                if (make === newMake) {
+                    return;
+                }
+            }
             const { data } = await api.get(`${urls.checkDuplicateMake}?Make=${make}`);
             if (data.exists) {
                 showToast("Make Already Exists", "error")
             }
             else {
                 try {
-                    const { data } = await api.post(urls.insertMake, {
-                        Make: make,
-                        Type: 1
-                    });
-                    showToast("Make Added", "success")
+                    if (newMake !== "") {
+                        console.log("dataaa", newMakeID)
+                        const { data } = await api.put(`${urls.updateMake}?id=${newMakeID}&Make=${make}`);
+
+                        if (data == "Make updated") {
+                            showToast("Make Updated", "success")
+                        }
+                    }
+                    else {
+                        const { data } = await api.post(urls.insertMake, {
+                            Make: make,
+                            Type: 1
+                        });
+                        showToast("Make Added", "success")
+                    }
+
                     getAllMakes();
                 }
                 catch (err) {
@@ -49,6 +91,17 @@ function VehicleMake() {
             console.error(err)
         }
     }
+
+    const handleEdit = (val, id) => {
+        setNewMake(val);
+        setNewMakeID(id);
+        setOpen(true)
+    }
+    const handleAddClick = () => {
+        setNewMake('');
+        setOpen(true)
+    }
+
 
     useEffect(() => {
         getAllMakes();
@@ -87,7 +140,7 @@ function VehicleMake() {
                                 ml: 1,
                                 mr: 1,
                             }}
-                            onClick={() => { setOpen(true) }}
+                            onClick={() => handleAddClick()}
                         >Add</Button>
                     </Grid>
                 </Grid>
@@ -97,6 +150,7 @@ function VehicleMake() {
                             <TableRow>
                                 <TableCell sx={{ width: "15%" }}>Sl No</TableCell>
                                 <TableCell>Make</TableCell>
+                                <TableCell sx={{ width: "15%" }}></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -111,10 +165,10 @@ function VehicleMake() {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{details.Make}</TableCell>
                                             <TableCell>
-                                                <IconButton >
+                                                <IconButton onClick={() => handleEdit(details.Make, details.MakeID)}>
                                                     <EditIcon color="primary" />
                                                 </IconButton>
-                                                <IconButton >
+                                                <IconButton onClick={()=>handleDeleteClick(details.MakeID)}>
                                                     <DeleteIcon color="error" />
                                                 </IconButton>
                                             </TableCell>
@@ -131,6 +185,14 @@ function VehicleMake() {
                 onClose={() => setOpen(false)}
                 onSubmit={handleAddMake}
                 title="Make"
+                content={newMake}
+            />
+            <ConfirmDialog
+                open={openDialog}
+                title="Delete Confirmation"
+                message="Are you sure you want to delete this item?"
+                onConfirm={handleDelete}
+                onCancel={() => setOpenDialog(false)}
             />
         </Grid>
     );

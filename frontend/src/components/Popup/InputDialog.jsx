@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -17,9 +17,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="down" ref={ref} {...props} />;
 });
 
-export const InputDialog = ({ open, onClose, onSubmit,title="" }) => {
+export const InputDialog = ({ open, onClose, onSubmit,title="",content="" }) => {
     const [value, setValue] = useState('');
-
+   useEffect(()=>{
+    setValue(content)
+   },[content])
     const handleSubmit = () => {
         if (value.trim()) {
             onSubmit(value);
@@ -78,7 +80,7 @@ export const InputDialog = ({ open, onClose, onSubmit,title="" }) => {
                     variant="contained"
                     sx={{ borderRadius: 2, textTransform: 'none' }}
                 >
-                    Add
+                   {content!==""?"Update":"Add"}
                 </Button>
             </DialogActions>
         </Dialog>

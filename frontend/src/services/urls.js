@@ -13,7 +13,9 @@ const urls={
     checkDuplicateItem:"/item/checkDuplicate",
     insertStock:"/stock/insert",
     getStockData:"/stock/stockDetails",
-    updateStock:"/stock/update"
+    updateStock:"/stock/update",
+    updateMake:"/makes/update",
+    deleteMake:"/makes/delete"
 }
 
 export default urls;

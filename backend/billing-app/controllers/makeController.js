@@ -54,3 +54,37 @@ exports.checkDuplicateMake = async (req, res) => {
     res.status(500).send('Insert failed');
   }
 };
+
+exports.updateMake = async (req, res) => {
+  const { id, Make } = req.query;
+  try {
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input('id', sql.Int, id)
+      .input('Make', sql.VarChar, Make)
+      .query('UPDATE VEHICLEMAKE SET MAKE=@Make WHERE MAKEID=@id');
+    res.status(200).send('Make updated');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Insert failed');
+  }
+};
+
+exports.deleteMake = async (req, res) => {
+  const { id } = req.query;
+  try {
+    if (!id) {
+      return res.status(400).json({ resultStatus: 'error', message: 'ID required' });
+    }
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input('id', sql.Int, id)
+      .query('DELETE FROM VEHICLEMAKE WHERE MAKEID=@id');
+    res.send('Make deleted');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Insert failed');
+  }
+};
