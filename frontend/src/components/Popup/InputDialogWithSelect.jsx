@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -14,24 +14,39 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import { CustomDropDown } from "../Inputs/CustomDropDown";
 import { CustomTextField } from '../Inputs/CustomTextField';
+import { useToast } from './ToastProvider';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="down" ref={ref} {...props} />;
 });
 
-export const InputDialogWithSelect = ({ open, onClose, onSubmit, title = "",selectOptions }) => {
+export const InputDialogWithSelect = ({ open, onClose, onSubmit, title = "", selectOptions, editID = 0, content = "" }) => {
     const [value, setValue] = useState('');
+    const {showToast}=useToast()
     const [id, setID] = useState(0);
     useEffect(() => {
         if (selectOptions.length > 0) {
             setID(selectOptions[0].id);
         }
-    }, [selectOptions]);
+
+    }, [selectOptions,editID]);
+
+    useEffect(() => {
+        setValue(content)
+    }, [content])
+
+    useEffect(() => {
+        setID(editID)
+    }, [editID])
+
     const handleSubmit = () => {
-        if (value.trim()) {
+        if (value.trim() && (id!==0 && id!==null)) {
             onSubmit(value, id);
             setValue('');
             onClose();
+        }
+        else{
+            showToast("Enter both details","error")
         }
     };
 

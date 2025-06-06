@@ -5,6 +5,6 @@ const modelController = require('../controllers/modelController');
 router.get('/', modelController.getAllModels);
 router.get('/checkDuplicate', modelController.checkDuplicateModel);
 router.post('/insert', modelController.insertModel);
-// router.post('/insert', makeController.insertMake);
-
+router.put('/update', modelController.updateModel);
+router.delete('/delete', modelController.deleteModel);
 module.exports = router;

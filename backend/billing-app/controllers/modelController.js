@@ -56,3 +56,41 @@ exports.insertModel = async (req, res) => {
     res.status(500).send('Insert failed');
   }
 };
+
+exports.updateModel = async (req, res) => {
+  const { id, Model,MakeID } = req.query;
+  try {
+    if (!id) {
+      return res.status(400).json({ resultStatus: 'error', message: 'ID required' });
+    }
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input('id', sql.Int, id)
+      .input('Model', sql.VarChar, Model)
+      .input('MakeID', sql.Int, MakeID)
+      .query('UPDATE VEHICLEMODEL SET Model=@Model,MakeID=@MakeID WHERE MODELID=@id');
+    res.status(200).send('Model updated');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Update failed');
+  }
+};
+
+exports.deleteModel = async (req, res) => {
+  const { id } = req.query;
+  try {
+    if (!id) {
+      return res.status(400).json({ resultStatus: 'error', message: 'ID required' });
+    }
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input('id', sql.Int, id)
+      .query('DELETE FROM VEHICLEMODEL WHERE MODELID=@id');
+    res.send('Model deleted');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Insert failed');
+  }
+};

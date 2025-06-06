@@ -190,7 +190,7 @@ function VehicleMake() {
             <ConfirmDialog
                 open={openDialog}
                 title="Delete Confirmation"
-                message="Are you sure you want to delete this item?"
+                message="Are you sure you want to delete this Make?"
                 onConfirm={handleDelete}
                 onCancel={() => setOpenDialog(false)}
             />

@@ -6,15 +6,24 @@ import urls from "../services/urls";
 import { useState, useEffect } from "react";
 import { useToast } from "../components/Popup/ToastProvider";
 import { InputDialogWithSelect } from "../components";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { ConfirmDialog } from "../components";
 
 function VehicleModel() {
-    const {showToast}=useToast()
+    const { showToast } = useToast()
     const [modelList, setModelList] = useState([])
     const [makeList, setMakeList] = useState([])
     const [model, setModel] = useState('');
     const [selectedMake, setSelectedMake] = useState(0);
     const [newMakeList, setNewMakeList] = useState([]);
     const [open, setOpen] = useState(false);
+    const [newModel, setNewModel] = useState('');
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newMakeID, setNewMakeID] = useState(0);
+    const [editID, setEditID] = useState(0);
+    const [deleteID, setDeleteID] = useState(0);
     useEffect(() => {
         const fetchMakes = async () => {
             try {
@@ -50,24 +59,50 @@ function VehicleModel() {
         fetchMakes();
     }, []);
 
-    const handleAddModel = async (model,id) => {
+    const handleDeleteClick=(id)=>{
+        setDeleteID(id);
+        setOpenDialog(true);
+    }
+
+    const handleEditClick = (val, makeid, modelid) => {
+
+        setNewModel(val);
+        setNewMakeID(makeid);
+        setEditID(modelid)
+        setOpen(true);
+    }
+
+    const handleAddModel = async (model, id) => {
         try {
+            if (model === newModel && id === selectedMake) {
+                return;
+            }
+
             const { data } = await api.get(`${urls.checkDuplicateModel}?Model=${model}&MakeID=${id}`);
-          
+
             if (data.exists) {
-                showToast("Model Already Exists","error")
+                showToast("Model Already Exists", "error")
             }
             else {
                 try {
-                    const { data } = await api.post(urls.insertModel, {
-                        Model: model,
-                        MakeID: id
-                    });
-                    showToast("Model Added","success")
+                    if (newModel != "" || editID !== 0) {
+                        const { data } = await api.put(`${urls.updateModel}?id=${editID}&Model=${model}&MakeID=${id}`)
+                        if (data == "Model updated") {
+                            showToast("Model Updated", "success")
+                        }
+                    }
+                    else {
+                        const { data } = await api.post(urls.insertModel, {
+                            Model: model,
+                            MakeID: id
+                        });
+                        showToast("Model Added", "success")
+                    }
+
                     getAllModels();
                 }
                 catch (err) {
-                    showToast("Error Occured","error")
+                    showToast("Error Occured", "error")
                     console.error(err)
                 }
             }
@@ -90,6 +125,32 @@ function VehicleModel() {
 
         }
     }
+
+    const handleAddClick = () => {
+        setNewMakeID(0);
+        setNewModel('');
+        setEditID(0)
+        setOpen(true);
+    }
+
+    const handleDelete = async () => {
+        try {
+            if (deleteID != 0) {
+                const { data } = await api.delete(`${urls.deleteModel}?id=${deleteID}`)
+                if (data === "Model deleted") {
+                    showToast("Model Deleted", "success")
+                    getAllModels()
+                }
+            }
+        }
+        catch (err) {
+            console.error(err)
+        }
+        finally {
+            setOpenDialog(false);
+        }
+    };
+
 
     return (
         <Grid container height="100%" direction={"column"} spacing={1} padding={1}>
@@ -131,7 +192,7 @@ function VehicleModel() {
                                 ml: 1,
                                 mr: 1,
                             }}
-                            onClick={() => setOpen(true)}
+                            onClick={() => handleAddClick()}
                         >Add</Button>
                     </Grid>
                 </Grid>
@@ -142,6 +203,7 @@ function VehicleModel() {
                                 <TableCell sx={{ width: "15%" }}>Sl No</TableCell>
                                 <TableCell>Model</TableCell>
                                 <TableCell>Make</TableCell>
+                                <TableCell sx={{ width: "15%" }}></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -156,6 +218,14 @@ function VehicleModel() {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{details.Model}</TableCell>
                                             <TableCell>{details.Make}</TableCell>
+                                            <TableCell>
+                                                <IconButton onClick={() => handleEditClick(details.Model, details.MakeID, details.ModelID)}>
+                                                    <EditIcon color="primary" />
+                                                </IconButton>
+                                                <IconButton onClick={()=>handleDeleteClick(details.ModelID)}>
+                                                    <DeleteIcon color="error" />
+                                                </IconButton>
+                                            </TableCell>
                                         </TableRow>
                                     ))
                                 )
@@ -170,6 +240,15 @@ function VehicleModel() {
                 onSubmit={handleAddModel}
                 title="Model"
                 selectOptions={newMakeList}
+                editID={newMakeID}
+                content={newModel}
+            />
+            <ConfirmDialog
+                open={openDialog}
+                title="Delete Confirmation"
+                message="Are you sure you want to delete this Model?"
+                onConfirm={handleDelete}
+                onCancel={() => setOpenDialog(false)}
             />
         </Grid>
     );

@@ -23,6 +23,8 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import CategoryIcon from '@mui/icons-material/Category';
 import StockEdit from '../pages/StockEdit';
+import WarehouseRoundedIcon from '@mui/icons-material/WarehouseRounded';
+import MopedRoundedIcon from '@mui/icons-material/MopedRounded';
 const NAVIGATION = [
   {
     kind: 'header',
@@ -83,12 +85,12 @@ const NAVIGATION = [
       {
         segment: 'make',
         title: 'Make',
-        icon: <DescriptionIcon />,
+        icon: <WarehouseRoundedIcon />,
       },
       {
         segment: 'model',
         title: 'Model',
-        icon: <DescriptionIcon />,
+        icon: <MopedRoundedIcon />,
       },
     ],
   },

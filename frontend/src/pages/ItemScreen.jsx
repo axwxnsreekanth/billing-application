@@ -5,19 +5,28 @@ import api from "../services/api";
 import urls from "../services/urls";
 import { InputDialogWithSelect } from "../components";
 import { useToast } from "../components/Popup/ToastProvider";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { ConfirmDialog } from "../components";
 
 function ItemScreen() {
-    const {showToast}=useToast();
+    const { showToast } = useToast();
     const [itemList, setItemList] = useState([]);
     const [itemName, setItemName] = useState("");
     const [categoryID, setCategoryID] = useState(0);
     const [categoryList, setCategoryList] = useState([]);
     const [categoryListPopUp, setCategoryListPopUp] = useState([]);
     const [open, setOpen] = useState(false);
+    const [newItem, setNewItem] = useState('');
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newCategoryID, setNewCategoryID] = useState(0);
+    const [editID, setEditID] = useState(0);
+    const [deleteID, setDeleteID] = useState(0);
     useEffect(() => {
         getCategoryList();
 
-    },[])
+    }, [])
 
     const getCategoryList = async () => {
         try {
@@ -29,7 +38,7 @@ function ItemScreen() {
                     description: Name
                 }))
                 ]
-                const formattedDataForPopup=[  ...data.data.map(({ ID, Name }) => ({
+                const formattedDataForPopup = [...data.data.map(({ ID, Name }) => ({
                     id: ID,
                     description: Name
                 }))]
@@ -53,29 +62,72 @@ function ItemScreen() {
         }
     }
 
-    const handleAddItem = async (item,id) => {
+    const handleAddItem = async (item, id) => {
         try {
-            const {data:res}=await api.get(`${urls.checkDuplicateItem}?itemName=${item}&categoryID=${id}`)
-            if(res.exists){
-                showToast("Item Already Exists","error")
+            if (item === newItem && id === categoryID) {
+                return;
             }
-            else{
-           const {data}=await api.post(urls.insertItem,{
-            itemName:item,
-            categoryID:id
-           })
-           showToast("Item Added","success")
-           getItems()
+            const { data: res } = await api.get(`${urls.checkDuplicateItem}?itemName=${item}&categoryID=${id}`)
+            if (res.exists) {
+                showToast("Item Already Exists", "error")
+            }
+            else {
+                if (newItem != "" || editID != "") {
+                    const { data } = await api.put(`${urls.updateItem}?id=${editID}&name=${item}&categoryID=${id}`)
+                    if (data == "Item updated") {
+                        showToast("Item Updated", "success")
+                    }
+                }
+                else{
+                    const { data } = await api.post(urls.insertItem, {
+                        itemName: item,
+                        categoryID: id
+                    })
+                    showToast("Item Added", "success")
+                }
+
+                getItems()
+            }
         }
-    }
-        catch (err) { 
-            showToast("Error Occured","error")
+        catch (err) {
+            showToast("Error Occured", "error")
         }
     };
 
     useEffect(() => {
         getItems();
     }, [itemName, categoryID])
+
+    const handleDeleteClick = (id) => {
+        setDeleteID(id);
+        setOpenDialog(true);
+    }
+
+    const handleEditClick = (val, catID, itemid) => {
+
+        setNewItem(val);
+        setNewCategoryID(catID);
+        setEditID(itemid)
+        setOpen(true);
+    }
+
+    const handleDelete = async () => {
+        try {
+            if (deleteID != 0) {
+                const { data } = await api.delete(`${urls.deleteItem}?id=${deleteID}`)
+                if (data === "Item deleted") {
+                    showToast("Item Deleted", "success")
+                    getItems()
+                }
+            }
+        }
+        catch (err) {
+            console.error(err)
+        }
+        finally {
+            setOpenDialog(false);
+        }
+    };
 
     return (
         <Grid container height="100%" direction={"column"} spacing={1} padding={1}>
@@ -114,7 +166,7 @@ function ItemScreen() {
                                 ml: 1,
                                 mr: 1,
                             }}
-                            onClick={()=>setOpen(true)}
+                            onClick={() => setOpen(true)}
                         >Add</Button>
                     </Grid>
                 </Grid>
@@ -125,6 +177,7 @@ function ItemScreen() {
                                 <TableCell sx={{ width: "10%" }}>Sl No</TableCell>
                                 <TableCell>Item </TableCell>
                                 <TableCell>Category</TableCell>
+                                <TableCell sx={{ width: "15%" }}></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -139,6 +192,14 @@ function ItemScreen() {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{details.ItemName}</TableCell>
                                             <TableCell>{details.CategoryName}</TableCell>
+                                            <TableCell>
+                                                <IconButton onClick={() => handleEditClick(details.ItemName, details.CategoryID, details.ItemID)}>
+                                                    <EditIcon color="primary" />
+                                                </IconButton>
+                                                <IconButton onClick={() => handleDeleteClick(details.ItemID)}>
+                                                    <DeleteIcon color="error" />
+                                                </IconButton>
+                                            </TableCell>
                                         </TableRow>
                                     ))
                                 )
@@ -153,6 +214,15 @@ function ItemScreen() {
                 onSubmit={handleAddItem}
                 title="Item"
                 selectOptions={categoryListPopUp}
+                editID={newCategoryID}
+                content={newItem}
+            />
+            <ConfirmDialog
+                open={openDialog}
+                title="Delete Confirmation"
+                message="Are you sure you want to delete this Item?"
+                onConfirm={handleDelete}
+                onCancel={() => setOpenDialog(false)}
             />
         </Grid>
     );

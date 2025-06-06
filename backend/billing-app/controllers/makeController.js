@@ -58,6 +58,9 @@ exports.checkDuplicateMake = async (req, res) => {
 exports.updateMake = async (req, res) => {
   const { id, Make } = req.query;
   try {
+    if (!id) {
+      return res.status(400).json({ resultStatus: 'error', message: 'ID required' });
+    }
     const pool = await poolPromise;
     const result = await pool
       .request()

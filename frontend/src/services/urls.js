@@ -15,7 +15,13 @@ const urls={
     getStockData:"/stock/stockDetails",
     updateStock:"/stock/update",
     updateMake:"/makes/update",
-    deleteMake:"/makes/delete"
+    deleteMake:"/makes/delete",
+    updateCategory:"/category/update",
+    deleteCategory:"/category/delete",
+    updateModel:"/models/update",
+    deleteModel:"/models/delete",
+    updateItem:"/item/update",
+    deleteItem:"/item/delete"
 }
 
 export default urls;
