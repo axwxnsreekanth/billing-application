@@ -12,16 +12,17 @@ exports.insertStock = async (req, res) => {
             .input('Quantity', sql.Int, StockData.quantity)
             .input('MRP', sql.Decimal(18, 2), StockData.mrp)
             .input('Barcode', sql.VarChar, StockData.barCode)
-            .input('isUniversal', sql.Int, StockData.isUniversal);
+            .input('isUniversal', sql.Int, StockData.isUniversal)
+            .input('PartNumber', sql.VarChar, StockData.partNumber);
 
         // Conditionally handle makeID and modelID
         if (StockData.makeID !== 0) {
             request.input('makeID', sql.Int, StockData.makeID);
             request.input('modelID', sql.Int, StockData.modelID);
-            await request.query('INSERT INTO STOCKDETAILS (ItemID,ItemName,CategoryID,Quantity,MRP,Barcode,makeID,modelID,isUniversal) VALUES (@ItemID,@ItemName,@CategoryID,@Quantity,@MRP,@Barcode,@makeID,@modelID,@isUniversal )');
+            await request.query('INSERT INTO STOCKDETAILS (ItemID,Item,CategoryID,Quantity,MRP,Barcode,PartNumber,makeID,modelID,isUniversal) VALUES (@ItemID,@ItemName,@CategoryID,@Quantity,@MRP,@Barcode,@PartNumber,@makeID,@modelID,@isUniversal )');
         }
         else {
-            await request.query('INSERT INTO STOCKDETAILS (ItemID,ItemName,CategoryID,Quantity,MRP,Barcode,isUniversal) VALUES (@ItemID,@ItemName,@CategoryID,@Quantity,@MRP,@Barcode,@isUniversal )');
+            await request.query('INSERT INTO STOCKDETAILS (ItemID,Item,CategoryID,Quantity,MRP,Barcode,PartNumber,isUniversal) VALUES (@ItemID,@ItemName,@CategoryID,@Quantity,@MRP,@Barcode,@PartNumber,@isUniversal )');
 
         }
         res.send('Stock inserted');
@@ -58,7 +59,7 @@ exports.getStockDetails = async (req, res) => {
 
 exports.updateStockDetails = async (req, res) => {
     try {
-        const { stockID, barCode, mrp, quantity } = req.query;
+        const { stockID, barCode, mrp, quantity,partNumber } = req.query;
         // Validation (Optional but recommended)
         if (!stockID) {
             return res.status(400).json({ resultStatus: 'error', message: 'stockID is required' });
@@ -68,15 +69,17 @@ exports.updateStockDetails = async (req, res) => {
         await pool
             .request()
             .input('stockID', sql.Int, stockID)
-            .input('BarCode', sql.VarChar(50), barCode) // set default if null
+            .input('BarCode', sql.VarChar(50), barCode) 
             .input('MRP', sql.Decimal(18, 2), mrp )
             .input('Quantity', sql.Int, quantity)
+            .input('PartNumber', sql.VarChar(50), partNumber) 
             .query(`
         UPDATE StockDetails
         SET 
           BarCode = @BarCode,
           MRP = @MRP,
-          Quantity = @Quantity
+          Quantity = @Quantity,
+          PartNumber=@PartNumber
         WHERE StockID = @stockID
       `);
 

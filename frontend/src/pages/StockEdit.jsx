@@ -24,6 +24,7 @@ const StockEdit = () => {
     const [qty, setQty] = useState(0)
     const [mrp, setMrp] = useState(0)
     const [barCode, setBarCode] = useState('')
+    const [partNumber, setPartNumber] = useState('')
     const [stockData, setStockData] = useState([]);
     const [stockID, setStockID] = useState(0);
     const handleCheckboxChange = (event) => {
@@ -32,7 +33,7 @@ const StockEdit = () => {
     };
     const handleSelect = (item) => {
         console.log("selected", item)
-        setItemName(item.ItemName)
+        setItemName(item.Item)
         setItemID(item.ItemID);
         setOpen(false);
         console.log("Set open to false");
@@ -44,7 +45,7 @@ const StockEdit = () => {
 
     const getItems = async () => {
         try {
-            const { data } = await api.get(`${urls.getAllItems}?itemName=${itemName}&categoryID=${categoryID}`)
+            const { data } = await api.get(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
             if (data.resultStatus == 'success') {
                 console.log("id", data.data)
                 setItemList(data.data);
@@ -82,9 +83,9 @@ const StockEdit = () => {
         try {
             const { data } = await api.get(`${urls.getCategories}?category=`)
             if (data.resultStatus == 'success') {
-                const formattedDataForPopup = [...data.data.map(({ ID, Name }) => ({
-                    id: ID,
-                    description: Name
+                const formattedDataForPopup = [...data.data.map(({ CategoryID, Category }) => ({
+                    id: CategoryID,
+                    description: Category
                 }))]
                 setCategoryList(formattedDataForPopup)
                 setCategoryID(formattedDataForPopup[0].id)
@@ -144,7 +145,7 @@ const StockEdit = () => {
             setMrp(details[0].MRP);
             setBarCode(details[0].Barcode);
             setStockID(details[0].StockID);
-
+            setPartNumber(details[0].PartNumber);
         }
         catch (err) {
             console.error(err)
@@ -153,7 +154,7 @@ const StockEdit = () => {
 
     const handleSave = async () => {
         try {
-            const { data } = await api.put(`${urls.updateStock}?stockID=${Number(stockID)}&barCode=${barCode}&mrp=${parseFloat(mrp).toFixed(2)}&quantity=${Number(qty)}`);
+            const { data } = await api.put(`${urls.updateStock}?stockID=${Number(stockID)}&barCode=${barCode}&mrp=${parseFloat(mrp).toFixed(2)}&quantity=${Number(qty)}&partNumber=${partNumber}`);
             if (data.resultStatus == "success") {
                 showToast("Stock updated", "success");
                 handleReset();
@@ -171,6 +172,7 @@ const StockEdit = () => {
         setMrp(0);
         setBarCode('');
         setStockData([])
+        setPartNumber('');
     }
 
     return (
@@ -280,10 +282,11 @@ const StockEdit = () => {
                     <Table>
                         <TableHead sx={{ backgroundColor: '#F9F9F9' }}>
                             <TableRow>
-                                <TableCell sx={{ width: "8%" }}>Sl No</TableCell>
+                             
                                 <TableCell>BarCode</TableCell>
                                 <TableCell>Stock</TableCell>
                                 <TableCell>MRP</TableCell>
+                                <TableCell>PartNumber</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -295,7 +298,7 @@ const StockEdit = () => {
                                 ) : (
 
                                     <TableRow>
-                                        <TableCell>1</TableCell>
+                                    
                                         <TableCell><CustomTextField value={barCode}
                                             handleChange={(e) => setBarCode(e.target.value)}
                                         /></TableCell>
@@ -303,6 +306,9 @@ const StockEdit = () => {
                                             handleChange={(e) => setQty(e.target.value)} /></TableCell>
                                         <TableCell><CustomTextField value={mrp}
                                             handleChange={(e) => setMrp(e.target.value)}
+                                        /></TableCell>
+                                            <TableCell><CustomTextField value={partNumber}
+                                            handleChange={(e) => setPartNumber(e.target.value)}
                                         /></TableCell>
                                     </TableRow>
 

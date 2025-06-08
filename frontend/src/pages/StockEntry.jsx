@@ -24,6 +24,7 @@ const StockEntry = () => {
     const [qty, setQty] = useState(0)
     const [mrp, setMrp] = useState(0)
     const [barCode, setBarCode] = useState('')
+    const [partNumber, setPartNumber] = useState('')
 
     const handleCheckboxChange = (event) => {
         setIsUniversalChecked(event.target.checked);
@@ -31,7 +32,7 @@ const StockEntry = () => {
     };
     const handleSelect = (item) => {
         console.log("selected", item)
-        setItemName(item.ItemName)
+        setItemName(item.Item)
         setItemID(item.ItemID);
         setOpen(false);
         console.log("Set open to false");
@@ -44,7 +45,7 @@ const StockEntry = () => {
     const getItems = async () => {
         try {
             console.log("pressed")
-            const { data } = await api.get(`${urls.getAllItems}?itemName=${itemName}&categoryID=${categoryID}`)
+            const { data } = await api.get(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
             if (data.resultStatus == 'success') {
                 console.log("id", data.data)
                 setItemList(data.data);
@@ -82,9 +83,9 @@ const StockEntry = () => {
         try {
             const { data } = await api.get(`${urls.getCategories}?category=`)
             if (data.resultStatus == 'success') {
-                const formattedDataForPopup = [...data.data.map(({ ID, Name }) => ({
-                    id: ID,
-                    description: Name
+                const formattedDataForPopup = [...data.data.map(({ CategoryID, Category }) => ({
+                    id: CategoryID,
+                    description: Category
                 }))]
                 setCategoryList(formattedDataForPopup)
                 setCategoryID(formattedDataForPopup[0].id)
@@ -131,7 +132,8 @@ const StockEntry = () => {
                 barCode: barCode || "",
                 makeID: isUniversalChecked ? 0 : Number(makeID),
                 modelID: isUniversalChecked ? 0 : Number(modelID),
-                isUniversal: isUniversalChecked ? 1 : 0
+                isUniversal: isUniversalChecked ? 1 : 0,
+                partNumber:partNumber
             }
 
             const { data } = await api.post(urls.insertStock, {
@@ -158,6 +160,7 @@ const StockEntry = () => {
         setQty(0);
         setMrp(0);
         setBarCode('');
+        setPartNumber('');
     }
 
     return (
@@ -215,7 +218,13 @@ const StockEntry = () => {
                             <CustomTextField value={barCode} handleChange={(e) => setBarCode(e.target.value)} />
                         </Grid>
                     </Grid>
-                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 2 }} alignItems={"center"}>
+                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 6 }} alignItems={"center"}>
+                        <CustomFormLabel text={"PartNumber"} />
+                        <Grid item flex={1}>
+                            <CustomTextField value={partNumber} handleChange={(e) => setPartNumber(e.target.value)} />
+                        </Grid>
+                    </Grid>
+                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 6 }} alignItems={"center"}>
                         <CustomFormLabel text={""} />
                         <Grid item flex={1} justifyContent={"flex-end"}>
                             <FormControlLabel
@@ -230,7 +239,7 @@ const StockEntry = () => {
                             />
                         </Grid>
                     </Grid>
-                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 4 }} alignItems={"center"}>
+                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 6 }} alignItems={"center"}>
                         <CustomFormLabel text={"Make"} />
                         <Grid item flex={1}>
                             <CustomDropDown options={newMakeList}

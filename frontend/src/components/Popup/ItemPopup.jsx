@@ -102,7 +102,7 @@ export const ItemPopup = ({ open, onClose, onSelect, items = [] }) => {
                                 {items.map((item, idx) => (
                                     <TableRow
                                         ref={(el) => (rowRefs.current[idx] = el)}
-                                        key={item.id}
+                                        key={item.ItemID}
                                         hover
                                         sx={{
                                             cursor: 'pointer',
@@ -129,7 +129,7 @@ export const ItemPopup = ({ open, onClose, onSelect, items = [] }) => {
                                                 color: selectedIndex === idx ? 'white' : 'inherit',
                                             }}
                                         >
-                                            {item.ItemName}
+                                            {item.Item}
                                         </TableCell>
                                     </TableRow>
                                 ))}
