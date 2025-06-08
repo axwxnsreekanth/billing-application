@@ -158,12 +158,12 @@ function CategoryScreen() {
                                     categoryList.map((details, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{details.Name}</TableCell>
+                                            <TableCell>{details.Category}</TableCell>
                                             <TableCell>
-                                                <IconButton onClick={() => handleEdit(details.Name, details.ID)}>
+                                                <IconButton onClick={() => handleEdit(details.Category, details.CategoryID)}>
                                                     <EditIcon color="primary" />
                                                 </IconButton>
-                                                <IconButton onClick={()=>handleDeleteClick(details.ID)}>
+                                                <IconButton onClick={()=>handleDeleteClick(details.CategoryID)}>
                                                     <DeleteIcon color="error" />
                                                 </IconButton>
                                             </TableCell>

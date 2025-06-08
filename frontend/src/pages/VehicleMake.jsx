@@ -83,6 +83,7 @@ function VehicleMake() {
     const getAllMakes = async () => {
         try {
             const { data } = await api.get(`${urls.getAllMakes}?make=${make}`)
+            console.log("mm",data)
             if (data.resultStatus === 'success') {
                 setMakeList(data.data)
             }

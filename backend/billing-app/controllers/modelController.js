@@ -6,9 +6,9 @@ exports.getAllModels = async (req, res) => {
     const pool = await poolPromise;
     const result = await pool
     .request()
-    .input('modelName', modelName)
+    .input('model', modelName)
     .input('makeID', makeID)
-    .execute('GetAllVehicleModels');
+    .execute('GetAllModels');
     res.status(200).json({
       resultStatus: 'success',
       data: result.recordset

@@ -33,14 +33,14 @@ function ItemScreen() {
             const { data } = await api.get(`${urls.getCategories}?category=`)
             if (data.resultStatus == 'success') {
                 const formattedData = [{ id: 0, description: "All categories" },
-                ...data.data.map(({ ID, Name }) => ({
-                    id: ID,
-                    description: Name
+                ...data.data.map(({ CategoryID, Category }) => ({
+                    id: CategoryID,
+                    description: Category
                 }))
                 ]
-                const formattedDataForPopup = [...data.data.map(({ ID, Name }) => ({
-                    id: ID,
-                    description: Name
+                const formattedDataForPopup = [...data.data.map(({ CategoryID, Category }) => ({
+                    id: CategoryID,
+                    description: Category
                 }))]
                 setCategoryListPopUp(formattedDataForPopup)
                 setCategoryList(formattedData)
@@ -190,10 +190,10 @@ function ItemScreen() {
                                     itemList.map((details, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{details.ItemName}</TableCell>
-                                            <TableCell>{details.CategoryName}</TableCell>
+                                            <TableCell>{details.Item}</TableCell>
+                                            <TableCell>{details.Category}</TableCell>
                                             <TableCell>
-                                                <IconButton onClick={() => handleEditClick(details.ItemName, details.CategoryID, details.ItemID)}>
+                                                <IconButton onClick={() => handleEditClick(details.Item, details.CategoryID, details.ItemID)}>
                                                     <EditIcon color="primary" />
                                                 </IconButton>
                                                 <IconButton onClick={() => handleDeleteClick(details.ItemID)}>

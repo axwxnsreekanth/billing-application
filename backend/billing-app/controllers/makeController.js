@@ -7,7 +7,7 @@ exports.getAllMakes = async (req, res) => {
     const result = await pool
       .request()
       .input('make', make)
-      .execute('GetAllVehicleMakes');
+      .execute('GetAllMakes');
     res.status(200).json({
       resultStatus: 'success',
       data: result.recordset

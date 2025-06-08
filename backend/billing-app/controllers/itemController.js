@@ -6,7 +6,7 @@ exports.getAllItems = async (req, res) => {
     const pool = await poolPromise;
     const result = await pool
       .request()
-      .input('itemName', itemName)
+      .input('item', itemName)
       .input('categoryID', categoryID)
       .execute('GetAllItems');
     res.status(200).json({
@@ -31,7 +31,7 @@ exports.insertItem = async (req, res) => {
         .request()
         .input('ItemName', sql.VarChar, itemName)
         .input('CategoryID', sql.Int, categoryID)
-        .query('INSERT INTO ITEM (ItemName, CategoryID) VALUES (@itemName, @categoryID)');
+        .query('INSERT INTO ITEM (Item, CategoryID) VALUES (@itemName, @categoryID)');
       res.send('Item inserted');
     } catch (err) {
       console.error(err);
@@ -47,7 +47,7 @@ exports.insertItem = async (req, res) => {
         .request()
         .input('itemName', sql.VarChar, itemName)
         .input('categoryID', sql.VarChar, categoryID)
-        .query('SELECT COUNT(*) AS count FROM Item WHERE ItemName = @itemName AND CategoryID=@categoryID');
+        .query('SELECT COUNT(*) AS count FROM Item WHERE Item = @itemName AND CategoryID=@categoryID');
   
       const count = result.recordset[0].count;
       res.json({ exists: count > 0 });
@@ -70,7 +70,7 @@ exports.insertItem = async (req, res) => {
       .input('id', sql.Int, id)
       .input('name', sql.VarChar, name)
       .input('categoryID', sql.Int, categoryID)
-      .query('UPDATE ITEM SET ITEMNAME=@name,CATEGORYID=@categoryID WHERE ITEMID=@id');
+      .query('UPDATE ITEM SET ITEM=@name,CATEGORYID=@categoryID WHERE ITEMID=@id');
     res.status(200).send('Item updated');
   } catch (err) {
     console.error(err);

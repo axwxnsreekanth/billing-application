@@ -29,7 +29,7 @@ exports.insertCategory = async (req, res) => {
     await pool
       .request()
       .input('Category', sql.VarChar, Category)
-      .query('INSERT INTO CATEGORY (Name, Type) VALUES (@Category, 1)');
+      .query('INSERT INTO CATEGORY (Category, Type) VALUES (@Category, 1)');
     res.send('Category inserted');
   } catch (err) {
     console.error(err);
@@ -44,7 +44,7 @@ exports.checkDuplicate = async (req, res) => {
     const result = await pool
       .request()
       .input('Category', sql.VarChar, Category)
-      .query('SELECT COUNT(*) AS count FROM Category WHERE NAME = @Category');
+      .query('SELECT COUNT(*) AS count FROM Category WHERE CATEGORY = @Category');
 
     const count = result.recordset[0].count;
     res.json({ exists: count > 0 });
@@ -65,7 +65,7 @@ exports.updateCategory = async (req, res) => {
       .request()
       .input('id', sql.Int, id)
       .input('Name', sql.VarChar, Name)
-      .query('UPDATE CATEGORY SET NAME=@Name WHERE ID=@id');
+      .query('UPDATE CATEGORY SET CATEGORY=@Name WHERE CATEGORYID=@id');
     res.status(200).send('Category updated');
   } catch (err) {
     console.error(err);
@@ -83,7 +83,7 @@ exports.deleteCategory = async (req, res) => {
     const result = await pool
       .request()
       .input('id', sql.Int, id)
-      .query('DELETE FROM CATEGORY WHERE ID=@id');
+      .query('DELETE FROM CATEGORY WHERE CATEGORYID=@id');
     res.send('Category deleted');
   } catch (err) {
     console.error(err);
