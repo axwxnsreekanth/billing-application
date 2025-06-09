@@ -216,6 +216,8 @@ const StockEdit = () => {
                 setBarCode(details[0].Barcode);
                 setStockID(details[0].StockID);
                 setPartNumber(details[0].PartNumber);
+                setCategoryID(details[0].CategoryID);
+                setItemName(details[0].Item);
                 if (details[0].IsUniversal == 1) {
                     setIsUniversalChecked(true)
                 }
@@ -246,12 +248,14 @@ const StockEdit = () => {
                 }
                 setStockData(data.data)
                 const details = data.data;
-              
+
                 setQty(details[0].Quantity);
                 setMrp(details[0].MRP);
                 setBarCode(details[0].Barcode);
                 setStockID(details[0].StockID);
                 setPartNumber(details[0].PartNumber);
+                setCategoryID(details[0].CategoryID);
+                setItemName(details[0].Item);
                 if (details[0].IsUniversal == 1) {
                     setIsUniversalChecked(true)
                 }

@@ -159,3 +159,47 @@ exports.getStockDetailsByPartNumber = async (req, res) => {
         });
     }
 };
+
+exports.getStockDetailsByBarcodeForBilling = async (req, res) => {
+    try {
+        const {barCode } = req.query;
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input('barCode', sql.VarChar, barCode)
+            .execute('GetStockDetailsForBillingByBarcode');
+        res.status(200).json({
+            resultStatus: 'success',
+            data: result.recordset
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            resultStatus: 'error',
+            message: 'Server error',
+            error: err.message
+        });
+    }
+};
+
+exports.getStockDetailsByPartNumberForBilling = async (req, res) => {
+    try {
+        const {partNumber } = req.query;
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input('partNumber', sql.VarChar, partNumber)
+            .execute('GetStockDetailsForBillingByPartNumber');
+        res.status(200).json({
+            resultStatus: 'success',
+            data: result.recordset
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            resultStatus: 'error',
+            message: 'Server error',
+            error: err.message
+        });
+    }
+};

@@ -24,7 +24,9 @@ const urls = {
     deleteItem: "/item/delete",
     deleteStock: "/stock/delete",
     stockDetailsByBarcode: "/stock/stockDetailsByBarcode",
-    stockDetailsByPartNumber: "/stock/stockDetailsByPartNumber"
+    stockDetailsByPartNumber: "/stock/stockDetailsByPartNumber",
+    stockDetailsByBarcodeBilling: "/stock/stockDetailsByBarcodeBilling",
+    stockDetailsByPartNumberBilling: "/stock/stockDetailsByPartNumberBilling"
 }
 
 export default urls;

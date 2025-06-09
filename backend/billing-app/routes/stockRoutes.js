@@ -8,4 +8,6 @@ router.put('/update', stockController.updateStockDetails);
 router.delete('/delete', stockController.deleteStock);
 router.get('/stockDetailsByBarcode', stockController.getStockDetailsByBarcode);
 router.get('/stockDetailsByPartNumber', stockController.getStockDetailsByPartNumber);
+router.get('/stockDetailsByBarcodeBilling', stockController.getStockDetailsByBarcodeForBilling);
+router.get('/stockDetailsByPartNumberBilling', stockController.getStockDetailsByPartNumberForBilling);
 module.exports = router;
