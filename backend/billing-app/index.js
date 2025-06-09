@@ -24,6 +24,8 @@ app.use('/item', itemRoutes);
 const stockRoutes = require('./routes/stockRoutes');
 app.use('/stock', stockRoutes);
 
+const billRoutes = require('./routes/billRoutes');
+app.use('/bill', billRoutes);
 
 // Optional: centralized error handling
 // const errorHandler = require('./middlewares/errorHandler');

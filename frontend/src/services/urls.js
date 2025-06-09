@@ -26,7 +26,8 @@ const urls = {
     stockDetailsByBarcode: "/stock/stockDetailsByBarcode",
     stockDetailsByPartNumber: "/stock/stockDetailsByPartNumber",
     stockDetailsByBarcodeBilling: "/stock/stockDetailsByBarcodeBilling",
-    stockDetailsByPartNumberBilling: "/stock/stockDetailsByPartNumberBilling"
+    stockDetailsByPartNumberBilling: "/stock/stockDetailsByPartNumberBilling",
+    insertBillDetails:"/bill/insert"
 }
 
 export default urls;

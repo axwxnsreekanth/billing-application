@@ -33,10 +33,19 @@ const BillingScreen = () => {
   const [stockData, setStockData] = useState([]);
   const [stockID, setStockID] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
+  const [labour, setLabour] = useState(0);
+  const [industry, setIndustry] = useState(0);
+  const [consumables, setConsumables] = useState(0);
+  const [lathework, setLathework] = useState(0);
+  const [technician, setTechnician] = useState('');
+  const [billedBy, setBilledBy] = useState('');
+  const [receivedAmount, setReceivedAmount] = useState(0);
   const [kart, setKart] = useState([]);
-  const handleCheckboxChange = (event) => {
-    setIsUniversalChecked(event.target.checked);
-  };
+  const paymentModes = [
+    { id: 1, description: "Cash" }, { id: 2, description: "UPI" }
+  ]
+  const [paymentMode, setPaymentMode] = useState(1);
+
 
 
   const handleAddClick = (details) => {
@@ -44,10 +53,15 @@ const BillingScreen = () => {
       showToast("Enter Item", "error");
       return;
     }
+    if (qty <= 0) {
+      showToast("Enter Quantity", "error");
+      return;
+    }
     if (details.Quantity == 0) {
       showToast("No Stock Available", "error");
       return;
     }
+
     if (parseFloat(details.Quantity) < parseFloat(qty)) {
       showToast("Invalid Quantity", "error");
       return;
@@ -128,6 +142,108 @@ const BillingScreen = () => {
     }
   }
 
+    const handlePartNumberSearch = async () => {
+    setBarCodeSearch('')
+    try {
+      if (partNumberSearch === "") {
+        showToast("Enter PartNumber", "warning");
+        return;
+      }
+      const { data } = await api.get(`${urls.stockDetailsByPartNumberBilling}?partNumber=${partNumberSearch}`);
+      if (data.resultStatus === "success") {
+        if (data.data.length == 0) {
+          showToast(`Stock With PartNumber ${partNumberSearch} Not Found`, "error");
+          return;
+        }
+        setStockData(data.data[0])
+        const details = data.data;
+        setQOH(details[0].Quantity);
+        setMrp(details[0].MRP);
+        setBarCode(details[0].Barcode);
+        setStockID(details[0].StockID);
+        setPartNumber(details[0].PartNumber);
+        setItemName(details[0].Item);
+        setItemID(details[0].ItemID);
+        setCategory(details[0].Category);
+        setBarCodeSearch(details[0].Barcode);
+        if (details[0].IsUniversal == 1) {
+          setIsUniversalChecked(true)
+        }
+        else {
+          setMake(details[0].Make);
+          setModel(details[0].Model);
+          setIsUniversalChecked(false)
+        }
+      }
+    }
+    catch (err) {
+      showToast("Something went wrong", "error")
+    }
+  }
+
+
+  const handleSave = async () => {
+    if (kart.length == 0) {
+      showToast("Enter Items", "error");
+      return;
+    }
+    if (receivedAmount == 0) {
+      showToast("Enter Received Amount", "error");
+      return;
+    }
+
+    try {
+      const billData = {
+        amount: Number(receivedAmount),
+        paymentMode: Number(paymentMode),
+        labour: Number(labour),
+        industry: Number(industry),
+        consumables: Number(consumables),
+        lathework: Number(lathework),
+        technician: technician,
+        billedBy: billedBy,
+
+        items: kart.map(item => ({
+          stockID: Number(item.stockid),
+          itemID: Number(item.itemid),
+          item: item.itemname,
+          categoryID: Number(item.categoryid),
+          category: item.categoryname,
+          quantity: Number(item.quantity),
+          barCode: item.barcode,
+          partNumber: item.barcode
+        }))
+
+      };
+      const { data } = await api.post(urls.insertBillDetails, {
+        billData: billData
+      })
+      if (data.message == "success") {
+        showToast("Bill Saved");
+        handleReset();
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+
+
+  }
+
+  const handleReset = () => {
+    setStockData([]);
+    setLabour(0);
+    setIndustry(0);
+    setConsumables(0);
+    setTechnician('');
+    setBilledBy('');
+    setPaymentMode(1);
+    setLathework(0);
+    setReceivedAmount(0);
+    setKart([])
+  }
+
+
   return (
     <Box
       sx={{
@@ -153,7 +269,8 @@ const BillingScreen = () => {
             <CustomFormLabel text={"PartNumber"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextFieldWithSearch value={partNumberSearch} handleChange={(e) => setPartNumberSearch(e.target.value)} />
+            <CustomTextFieldWithSearch value={partNumberSearch} handleChange={(e) => setPartNumberSearch(e.target.value)} 
+              handleSearch={handlePartNumberSearch}/>
           </Grid>
         </Grid>
 
@@ -250,7 +367,7 @@ const BillingScreen = () => {
             ml: 1,
             mr: 1,
           }}
-          onClick={() => handleResetForNewItem}
+          onClick={handleResetForNewItem}
         >
           Clear
         </Button>
@@ -315,7 +432,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Labour"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomTextField value={labour} handleChange={(e) => setLabour(e.target.value)} />
           </Grid>
         </Grid>
         <Grid container size={{ md: 6, lg: 3 }} alignItems={"center"}>
@@ -323,7 +440,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Industrial Charge"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomTextField value={industry} handleChange={(e) => setIndustry(e.target.value)} />
           </Grid>
         </Grid>
 
@@ -333,7 +450,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Consumables"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomTextField value={consumables} handleChange={(e) => setConsumables(e.target.value)} />
           </Grid>
         </Grid>
 
@@ -342,7 +459,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Lathework"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomTextField value={lathework} handleChange={(e) => setLathework(e.target.value)} />
           </Grid>
         </Grid>
         <Grid container size={{ md: 6, lg: 6 }} alignItems={"center"}>
@@ -350,7 +467,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Technician"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomTextField value={technician} handleChange={(e) => setTechnician(e.target.value)} />
           </Grid>
         </Grid>
         <Grid container size={{ md: 6, lg: 6 }} alignItems={"center"}>
@@ -358,7 +475,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Billed By"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomTextField value={billedBy} handleChange={(e) => setBilledBy(e.target.value)} />
           </Grid>
         </Grid>
         <Grid container size={{ md: 6, lg: 3 }} alignItems={"center"}>
@@ -366,7 +483,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Received Amount"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomTextField value={receivedAmount} handleChange={(e) => setReceivedAmount(e.target.value)} />
           </Grid>
         </Grid>
         <Grid container size={{ md: 6, lg: 3 }} alignItems={"center"}>
@@ -374,7 +491,7 @@ const BillingScreen = () => {
             <CustomFormLabel text={"Payment Mode"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField />
+            <CustomDropDown value={paymentMode} options={paymentModes} handleChange={(e) => setPaymentMode(e.target.value)} />
           </Grid>
         </Grid>
         <Grid container size={{ md: 12, lg: 6 }} direction={"row"} alignItems={"center"} justifyContent={"flex-end"}>
@@ -391,7 +508,7 @@ const BillingScreen = () => {
               ml: 1,
               mr: 1,
             }}
-           
+            onClick={handleSave}
           >
             Save
           </Button>
@@ -408,7 +525,7 @@ const BillingScreen = () => {
               ml: 1,
               mr: 1,
             }}
-           
+            onClick={handleReset}
           >
             Cancel
           </Button>
