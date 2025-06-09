@@ -94,3 +94,68 @@ exports.updateStockDetails = async (req, res) => {
     }
 };
 
+exports.deleteStock = async (req, res) => {
+    try {
+        const { stockID } = req.query;
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input('stockID', sql.Int, stockID)
+            .query('DELETE FROM STOCKDETAILS WHERE STOCKID=@stockID');
+        res.status(200).json({
+            resultStatus: 'success',
+            data: result.recordset
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            resultStatus: 'error',
+            message: 'Server error',
+            error: err.message
+        });
+    }
+};
+
+exports.getStockDetailsByBarcode = async (req, res) => {
+    try {
+        const {barCode } = req.query;
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input('barCode', sql.VarChar, barCode)
+            .query('SELECT * FROM STOCKDETAILS WHERE BARCODE=@barCode');
+        res.status(200).json({
+            resultStatus: 'success',
+            data: result.recordset
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            resultStatus: 'error',
+            message: 'Server error',
+            error: err.message
+        });
+    }
+};
+
+exports.getStockDetailsByPartNumber = async (req, res) => {
+    try {
+        const {partNumber } = req.query;
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input('partNumber', sql.VarChar, partNumber)
+            .query('SELECT * FROM STOCKDETAILS WHERE PARTNUMBER=@partNumber');
+        res.status(200).json({
+            resultStatus: 'success',
+            data: result.recordset
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            resultStatus: 'error',
+            message: 'Server error',
+            error: err.message
+        });
+    }
+};

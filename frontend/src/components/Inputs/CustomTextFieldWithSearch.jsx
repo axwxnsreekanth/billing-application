@@ -26,24 +26,17 @@ export const CustomTextFieldWithSearch = ({
   const theme = useTheme();
   const [search, setSearch] = useState(value); // Initialize with prop value
 
-  const handleTextChange = (e) => {
-    setSearch(e.target.value);
-    handleChange(e.target.value);
-  };
+
 
   const handleSearchClick = () => {
-    handleSearch(search); // Call handleSearch when search is triggered
+    handleSearch(); // Call handleSearch when search is triggered
   };
 
-  const handleClear = () => {
-    setSearch(""); // Clear input
-    handleChange(""); // Reset parent state
-  };
 
   // Handle Enter key press
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      handleSearch(search); // Call handleSearch when Enter is pressed
+      handleSearch(); // Call handleSearch when Enter is pressed
     }
   };
 
@@ -53,7 +46,7 @@ export const CustomTextFieldWithSearch = ({
       disabled={disabled}
       value={value}
       inputRef={inputRef}
-      onChange={handleTextChange}
+      onChange={handleChange}
       onKeyDown={handleKeyDown} // Add onKeyDown event listener
       onKeyPress={handleKeyPress} // Add onKeyPress event listener
       placeholder={placeholder}
