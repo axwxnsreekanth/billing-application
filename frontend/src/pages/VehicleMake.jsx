@@ -40,7 +40,7 @@ function VehicleMake() {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
         finally {
             setOpenDialog(false);
@@ -64,7 +64,6 @@ function VehicleMake() {
             else {
                 try {
                     if (newMake !== "") {
-                        console.log("dataaa", newMakeID)
                         const { data } = await api.put(`${urls.updateMake}?id=${newMakeID}&Make=${make}`);
 
                         if (data == "Make updated") {
@@ -83,7 +82,7 @@ function VehicleMake() {
                 }
                 catch (err) {
                     showToast("Error Occured", "error")
-                    console.error(err)
+                   
                 }
             }
         }
@@ -97,7 +96,7 @@ function VehicleMake() {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
     }
 

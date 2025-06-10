@@ -131,7 +131,7 @@ function ItemScreen() {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
         finally {
             setOpenDialog(false);

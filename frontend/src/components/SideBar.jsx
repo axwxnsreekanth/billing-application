@@ -28,13 +28,13 @@ import MopedRoundedIcon from '@mui/icons-material/MopedRounded';
 const NAVIGATION = [
   {
     kind: 'header',
-    title: 'Main items',
+    title: '',
   },
-  {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
+  // {
+  //   segment: 'dashboard',
+  //   title: 'Dashboard',
+  //   icon: <DashboardIcon />,
+  // },
   {
     segment: 'orders',
     title: 'Billing',
@@ -138,8 +138,8 @@ function useDemoRouter(initialPath) {
 
 function renderPage(pathname) {
   switch (pathname) {
-    case '/dashboard':
-      return <BillingScreen />;
+    // case '/dashboard':
+    //   return <BillingScreen />;
     case '/orders':
       return <BillingScreen />;
     case '/vehicle/make':

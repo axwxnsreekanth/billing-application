@@ -72,7 +72,7 @@ function CategoryScreen() {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
         finally {
             setOpenDialog(false);
@@ -91,7 +91,7 @@ function CategoryScreen() {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
     }
     useEffect(() => {

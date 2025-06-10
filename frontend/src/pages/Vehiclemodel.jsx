@@ -54,7 +54,7 @@ function VehicleModel() {
                 }
             }
             catch (err) {
-                console.error(err)
+                showToast("Failed,Something went wrong","error");
             }
         };
 
@@ -105,7 +105,7 @@ function VehicleModel() {
                 }
                 catch (err) {
                     showToast("Error Occured", "error")
-                    console.error(err)
+                   
                 }
             }
         }
@@ -153,7 +153,7 @@ function VehicleModel() {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
         finally {
             setOpenDialog(false);

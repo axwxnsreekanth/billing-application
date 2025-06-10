@@ -71,7 +71,7 @@ const StockEntry = () => {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
     };
 
@@ -177,7 +177,7 @@ const StockEntry = () => {
         }
         catch (err) {
             showToast("Error Occured", "error")
-            console.error(err)
+         
         }
 
     }

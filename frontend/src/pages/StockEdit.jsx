@@ -36,11 +36,10 @@ const StockEdit = () => {
 
     };
     const handleSelect = (item) => {
-        console.log("selected", item)
         setItemName(item.Item)
         setItemID(item.ItemID);
         setOpen(false);
-        console.log("Set open to false");
+       
     }
     useEffect(() => {
         getCategoryList();
@@ -51,13 +50,12 @@ const StockEdit = () => {
         try {
             const { data } = await api.get(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
             if (data.resultStatus == 'success') {
-                console.log("id", data.data)
                 setItemList(data.data);
                 setOpen(true)
             }
         }
         catch (err) {
-            console.error(err)
+           showToast("Failed,Something went wrong","error");
         }
     }
 
@@ -79,7 +77,7 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
     };
 
@@ -159,7 +157,7 @@ const StockEdit = () => {
             setPartNumber(details[0].PartNumber);
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
     }
 
@@ -202,7 +200,7 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
     }
 
@@ -219,7 +217,7 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-            console.error(err)
+            showToast("Failed,Something went wrong","error");
         }
         finally {
             setOpenDialog(false);

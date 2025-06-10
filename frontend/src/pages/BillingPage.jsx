@@ -249,7 +249,7 @@ const BillingScreen = () => {
       }
     }
     catch (err) {
-      console.log(err)
+      showToast("Failed,Something went wrong","error");
     }
 
 
