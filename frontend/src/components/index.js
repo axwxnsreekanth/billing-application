@@ -10,3 +10,4 @@ export {CustomQuantityTextField} from "./Inputs/CustomQuantityTextField";
 export {ToastProvider} from "./Popup/ToastProvider";
 export {CustomTextFieldWithSearch} from "./Inputs/CustomTextFieldWithSearch";
 export {ConfirmDialog} from "./Popup/ConfirmationDialog";
+export {InfoDialog} from "./Popup/InfoDialog";

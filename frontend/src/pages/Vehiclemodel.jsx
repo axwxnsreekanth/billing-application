@@ -10,6 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
+import { InfoDialog } from "../components";
 
 function VehicleModel() {
     const { showToast } = useToast()
@@ -24,6 +25,7 @@ function VehicleModel() {
     const [newMakeID, setNewMakeID] = useState(0);
     const [editID, setEditID] = useState(0);
     const [deleteID, setDeleteID] = useState(0);
+    const [openInfoDialog, setOpenInfoDialog] = useState(false);
     useEffect(() => {
         const fetchMakes = async () => {
             try {
@@ -59,7 +61,7 @@ function VehicleModel() {
         fetchMakes();
     }, []);
 
-    const handleDeleteClick=(id)=>{
+    const handleDeleteClick = (id) => {
         setDeleteID(id);
         setOpenDialog(true);
     }
@@ -136,6 +138,13 @@ function VehicleModel() {
     const handleDelete = async () => {
         try {
             if (deleteID != 0) {
+                const { data: stockExists } = await api.get(`${urls.stockDetailsByModel}?modelID=${deleteID}`)
+                if (stockExists.resultStatus == "success") {
+                    if (stockExists.exists) {
+                        setOpenInfoDialog(true)
+                        return;
+                    }
+                }
                 const { data } = await api.delete(`${urls.deleteModel}?id=${deleteID}`)
                 if (data === "Model deleted") {
                     showToast("Model Deleted", "success")
@@ -222,7 +231,7 @@ function VehicleModel() {
                                                 <IconButton onClick={() => handleEditClick(details.Model, details.MakeID, details.ModelID)}>
                                                     <EditIcon color="primary" />
                                                 </IconButton>
-                                                <IconButton onClick={()=>handleDeleteClick(details.ModelID)}>
+                                                <IconButton onClick={() => handleDeleteClick(details.ModelID)}>
                                                     <DeleteIcon color="error" />
                                                 </IconButton>
                                             </TableCell>
@@ -249,6 +258,11 @@ function VehicleModel() {
                 message="Are you sure you want to delete this Model?"
                 onConfirm={handleDelete}
                 onCancel={() => setOpenDialog(false)}
+            />
+            <InfoDialog
+                open={openInfoDialog}
+                onClose={() => setOpenInfoDialog(false)}
+                message="Selected model has stock entry,kindly delete that first."
             />
         </Grid>
     );

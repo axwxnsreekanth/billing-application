@@ -40,6 +40,8 @@ const BillingScreen = () => {
   const [technician, setTechnician] = useState('');
   const [billedBy, setBilledBy] = useState('');
   const [receivedAmount, setReceivedAmount] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [finalAmount, setFinalAmount] = useState(0);
   const [kart, setKart] = useState([]);
   const paymentModes = [
     { id: 1, description: "Cash" }, { id: 2, description: "UPI" }
@@ -87,6 +89,24 @@ const BillingScreen = () => {
     const newKart = kart.filter(item => item.stockid != id)
     setKart(newKart);
   }
+
+  const findTotal = () => {
+    let totalAmount = kart.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    setTotal(totalAmount);
+  }
+
+  useEffect(() => {
+    findTotal();
+  }, [kart])
+
+  const findFinalAmount = () => {
+    let sum = parseFloat(total) + parseFloat(labour) + parseFloat(industry) + parseFloat(consumables) + parseFloat(lathework);
+    setFinalAmount(sum);
+  }
+
+  useEffect(() => {
+    findFinalAmount();
+  }, [total, labour, industry, consumables, lathework])
 
   const handleResetForNewItem = () => {
     setBarCodeSearch('');
@@ -142,7 +162,7 @@ const BillingScreen = () => {
     }
   }
 
-    const handlePartNumberSearch = async () => {
+  const handlePartNumberSearch = async () => {
     setBarCodeSearch('')
     try {
       if (partNumberSearch === "") {
@@ -191,6 +211,10 @@ const BillingScreen = () => {
       showToast("Enter Received Amount", "error");
       return;
     }
+    if (parseFloat(finalAmount) < parseFloat(receivedAmount)) {
+      showToast("Received Amount Is Greater Than Final Amount", "error");
+      return;
+    }
 
     try {
       const billData = {
@@ -202,7 +226,7 @@ const BillingScreen = () => {
         lathework: Number(lathework),
         technician: technician,
         billedBy: billedBy,
-
+        totalamount: finalAmount,
         items: kart.map(item => ({
           stockID: Number(item.stockid),
           itemID: Number(item.itemid),
@@ -211,7 +235,8 @@ const BillingScreen = () => {
           category: item.categoryname,
           quantity: Number(item.quantity),
           barCode: item.barcode,
-          partNumber: item.barcode
+          partNumber: item.partnumber,
+          amount: item.amount
         }))
 
       };
@@ -269,8 +294,8 @@ const BillingScreen = () => {
             <CustomFormLabel text={"PartNumber"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextFieldWithSearch value={partNumberSearch} handleChange={(e) => setPartNumberSearch(e.target.value)} 
-              handleSearch={handlePartNumberSearch}/>
+            <CustomTextFieldWithSearch value={partNumberSearch} handleChange={(e) => setPartNumberSearch(e.target.value)}
+              handleSearch={handlePartNumberSearch} />
           </Grid>
         </Grid>
 
@@ -418,7 +443,7 @@ const BillingScreen = () => {
                   Total Amount
                 </TableCell>
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-                  ₹{kart.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)}
+                  ₹{total}
                 </TableCell>
               </TableRow>
             </TableFooter>
@@ -480,6 +505,14 @@ const BillingScreen = () => {
         </Grid>
         <Grid container size={{ md: 6, lg: 3 }} alignItems={"center"}>
           <Grid item>
+            <CustomFormLabel text={"Total Amount"} />
+          </Grid>
+          <Grid item flex={1}>
+            <CustomTextField value={finalAmount} />
+          </Grid>
+        </Grid>
+        <Grid container size={{ md: 6, lg: 3 }} alignItems={"center"}>
+          <Grid item>
             <CustomFormLabel text={"Received Amount"} />
           </Grid>
           <Grid item flex={1}>
@@ -494,7 +527,7 @@ const BillingScreen = () => {
             <CustomDropDown value={paymentMode} options={paymentModes} handleChange={(e) => setPaymentMode(e.target.value)} />
           </Grid>
         </Grid>
-        <Grid container size={{ md: 12, lg: 6 }} direction={"row"} alignItems={"center"} justifyContent={"flex-end"}>
+        <Grid container size={{ md: 12, lg: 12 }} direction={"row"} alignItems={"center"} justifyContent={"center"}>
 
           <Button
             type="button"

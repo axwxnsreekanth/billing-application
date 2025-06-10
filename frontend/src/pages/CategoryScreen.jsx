@@ -9,7 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
-
+import { InfoDialog } from "../components";
 
 function CategoryScreen() {
     const { showToast } = useToast();
@@ -20,7 +20,7 @@ function CategoryScreen() {
     const [open, setOpen] = useState(false);
     const [deleteID, setDeleteID] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
-
+    const [openInfoDialog, setOpenInfoDialog] = useState(false);
     const handleAddCategory = async (val) => {
         try {
             if (newCategory !== "") {
@@ -57,6 +57,13 @@ function CategoryScreen() {
     const handleDelete = async () => {
         try {
             if (deleteID != 0) {
+                const { data: stockExists } = await api.get(`${urls.stockDetailsByCategory}?categoryID=${deleteID}`)
+                if (stockExists.resultStatus == "success") {
+                    if (stockExists.exists) {
+                        setOpenInfoDialog(true)
+                        return;
+                    }
+                }
                 const { data } = await api.delete(`${urls.deleteCategory}?id=${deleteID}`)
                 if (data === "Category deleted") {
                     showToast("Category Deleted", "success")
@@ -163,7 +170,7 @@ function CategoryScreen() {
                                                 <IconButton onClick={() => handleEdit(details.Category, details.CategoryID)}>
                                                     <EditIcon color="primary" />
                                                 </IconButton>
-                                                <IconButton onClick={()=>handleDeleteClick(details.CategoryID)}>
+                                                <IconButton onClick={() => handleDeleteClick(details.CategoryID)}>
                                                     <DeleteIcon color="error" />
                                                 </IconButton>
                                             </TableCell>
@@ -185,9 +192,14 @@ function CategoryScreen() {
             <ConfirmDialog
                 open={openDialog}
                 title="Delete Confirmation"
-                message="Are you sure you want to delete this Category?"
+                message="Are you sure you want to delete this Category? Associated Items will also be deleted."
                 onConfirm={handleDelete}
                 onCancel={() => setOpenDialog(false)}
+            />
+            <InfoDialog
+                open={openInfoDialog}
+                onClose={() => setOpenInfoDialog(false)}
+                message="Selected category has stock entry,kindly delete that first."
             />
         </Grid>
     );

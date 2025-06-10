@@ -10,6 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
+import { InfoDialog } from "../components";
 
 function VehicleMake() {
     const { showToast } = useToast();
@@ -19,25 +20,33 @@ function VehicleMake() {
     const [newMake, setNewMake] = useState('');
     const [newMakeID, setNewMakeID] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
-    const [deleteID,setDeleteID]=useState(0);
-    const handleDelete = async() => {
-        try{
-            if(deleteID!=0){
-                const {data}=await api.delete(`${urls.deleteMake}?id=${deleteID}`)
-                if(data==="Make deleted"){
-                     showToast("Make Deleted", "success")
-                     getAllMakes();
+    const [deleteID, setDeleteID] = useState(0);
+    const [openInfoDialog, setOpenInfoDialog] = useState(false);
+    const handleDelete = async () => {
+        try {
+            if (deleteID != 0) {
+                const { data: stockExists } = await api.get(`${urls.stockDetailsByMake}?makeID=${deleteID}`)
+                if (stockExists.resultStatus == "success") {
+                    if (stockExists.exists) {
+                        setOpenInfoDialog(true)
+                        return;
+                    }
+                }
+                const { data } = await api.delete(`${urls.deleteMake}?id=${deleteID}`)
+                if (data === "Make deleted") {
+                    showToast("Make Deleted", "success")
+                    getAllMakes();
                 }
             }
         }
-        catch(err){
+        catch (err) {
             console.error(err)
         }
-        finally{
-        setOpenDialog(false);
+        finally {
+            setOpenDialog(false);
         }
     };
-    const handleDeleteClick=(id)=>{
+    const handleDeleteClick = (id) => {
         setDeleteID(id);
         setOpenDialog(true)
     }
@@ -83,7 +92,6 @@ function VehicleMake() {
     const getAllMakes = async () => {
         try {
             const { data } = await api.get(`${urls.getAllMakes}?make=${make}`)
-            console.log("mm",data)
             if (data.resultStatus === 'success') {
                 setMakeList(data.data)
             }
@@ -169,7 +177,7 @@ function VehicleMake() {
                                                 <IconButton onClick={() => handleEdit(details.Make, details.MakeID)}>
                                                     <EditIcon color="primary" />
                                                 </IconButton>
-                                                <IconButton onClick={()=>handleDeleteClick(details.MakeID)}>
+                                                <IconButton onClick={() => handleDeleteClick(details.MakeID)}>
                                                     <DeleteIcon color="error" />
                                                 </IconButton>
                                             </TableCell>
@@ -191,9 +199,14 @@ function VehicleMake() {
             <ConfirmDialog
                 open={openDialog}
                 title="Delete Confirmation"
-                message="Are you sure you want to delete this Make?"
+                message="Are you sure you want to delete this Make? Associated Models will also be deleted."
                 onConfirm={handleDelete}
                 onCancel={() => setOpenDialog(false)}
+            />
+            <InfoDialog
+                open={openInfoDialog}
+                onClose={() => setOpenInfoDialog(false)}
+                message="Selected make has stock entry,kindly delete that first."
             />
         </Grid>
     );

@@ -9,6 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
+import { InfoDialog } from "../components";
 
 function ItemScreen() {
     const { showToast } = useToast();
@@ -23,6 +24,7 @@ function ItemScreen() {
     const [newCategoryID, setNewCategoryID] = useState(0);
     const [editID, setEditID] = useState(0);
     const [deleteID, setDeleteID] = useState(0);
+      const [openInfoDialog, setOpenInfoDialog] = useState(false);
     useEffect(() => {
         getCategoryList();
 
@@ -78,7 +80,7 @@ function ItemScreen() {
                         showToast("Item Updated", "success")
                     }
                 }
-                else{
+                else {
                     const { data } = await api.post(urls.insertItem, {
                         itemName: item,
                         categoryID: id
@@ -114,6 +116,13 @@ function ItemScreen() {
     const handleDelete = async () => {
         try {
             if (deleteID != 0) {
+                const { data: stockExists } = await api.get(`${urls.stockDetailsByItem}?itemID=${deleteID}`)
+                if (stockExists.resultStatus == "success") {
+                    if (stockExists.exists) {
+                        setOpenInfoDialog(true)
+                        return;
+                    }
+                }
                 const { data } = await api.delete(`${urls.deleteItem}?id=${deleteID}`)
                 if (data === "Item deleted") {
                     showToast("Item Deleted", "success")
@@ -223,6 +232,11 @@ function ItemScreen() {
                 message="Are you sure you want to delete this Item?"
                 onConfirm={handleDelete}
                 onCancel={() => setOpenDialog(false)}
+            />
+            <InfoDialog
+                open={openInfoDialog}
+                onClose={() => setOpenInfoDialog(false)}
+                message="Selected item has stock entry,kindly delete that first."
             />
         </Grid>
     );

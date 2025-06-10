@@ -164,7 +164,37 @@ const StockEdit = () => {
     }
 
     const handleSave = async () => {
+        if (itemName == "") {
+            showToast("Select Item To Edit", "error");
+            return;
+        }
+        if (Number(itemID) == 0) {
+            showToast("Invalid Item", "error");
+            return;
+        }
+        if (barCode == "") {
+            showToast("Enter Barcode", "error");
+            return;
+        }
         try {
+            if (barCode != stockData[0].Barcode) {
+                const { data: bcExists } = await api.get(`${urls.checkDuplicateBarcode}?barcode=${barCode}`)
+                if (bcExists.resultStatus == "success") {
+                    if (bcExists.exists) {
+                        showToast("Barcode Already Exists", "error");
+                        return;
+                    }
+                }
+            }
+            if (partNumber != "" && partNumber != stockData[0].PartNumber) {
+                const { data: pnExists } = await api.get(`${urls.checkDuplicatePartNumber}?partNumber=${partNumber}`)
+                if (pnExists.resultStatus == "success") {
+                    if (pnExists.exists) {
+                        showToast("PartNumber Already Exists", "error");
+                        return;
+                    }
+                }
+            }
             const { data } = await api.put(`${urls.updateStock}?stockID=${Number(stockID)}&barCode=${barCode}&mrp=${parseFloat(mrp).toFixed(2)}&quantity=${Number(qty)}&partNumber=${partNumber}`);
             if (data.resultStatus == "success") {
                 showToast("Stock updated", "success");
@@ -218,6 +248,7 @@ const StockEdit = () => {
                 setPartNumber(details[0].PartNumber);
                 setCategoryID(details[0].CategoryID);
                 setItemName(details[0].Item);
+                setItemID(details[0].ItemID);
                 if (details[0].IsUniversal == 1) {
                     setIsUniversalChecked(true)
                 }
@@ -256,6 +287,7 @@ const StockEdit = () => {
                 setPartNumber(details[0].PartNumber);
                 setCategoryID(details[0].CategoryID);
                 setItemName(details[0].Item);
+                setItemID(details[0].ItemID);
                 if (details[0].IsUniversal == 1) {
                     setIsUniversalChecked(true)
                 }
@@ -267,7 +299,7 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-            showToast("Soemthing went wrong", "error")
+            showToast("Something went wrong", "error")
         }
     }
 
@@ -331,6 +363,7 @@ const StockEdit = () => {
                         <CustomFormLabel text={"Item"} />
                         <Grid item flex={1}>
                             <CustomTextField value={itemName}
+                                placeholder={"Press Enter To List Items......"}
                                 handleChange={(e) => setItemName(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {

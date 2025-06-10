@@ -27,7 +27,13 @@ const urls = {
     stockDetailsByPartNumber: "/stock/stockDetailsByPartNumber",
     stockDetailsByBarcodeBilling: "/stock/stockDetailsByBarcodeBilling",
     stockDetailsByPartNumberBilling: "/stock/stockDetailsByPartNumberBilling",
-    insertBillDetails:"/bill/insert"
+    insertBillDetails:"/bill/insert",
+    stockDetailsByMake: "/stock/stockDetailsByMake",
+    stockDetailsByModel: "/stock/stockDetailsByModel",
+    stockDetailsByItem: "/stock/stockDetailsByItem",
+    stockDetailsByCategory: "/stock/stockDetailsByCategory",
+    checkDuplicateBarcode: "/stock/duplicateBarcode",
+    checkDuplicatePartNumber: "/stock/duplicatePartNumber",
 }
 
 export default urls;

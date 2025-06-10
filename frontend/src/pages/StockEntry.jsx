@@ -31,11 +31,9 @@ const StockEntry = () => {
 
     };
     const handleSelect = (item) => {
-        console.log("selected", item)
         setItemName(item.Item)
         setItemID(item.ItemID);
         setOpen(false);
-        console.log("Set open to false");
     }
     useEffect(() => {
         getCategoryList();
@@ -44,10 +42,8 @@ const StockEntry = () => {
 
     const getItems = async () => {
         try {
-            console.log("pressed")
             const { data } = await api.get(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
             if (data.resultStatus == 'success') {
-                console.log("id", data.data)
                 setItemList(data.data);
                 setOpen(true)
             }
@@ -122,7 +118,39 @@ const StockEntry = () => {
     }, [makeID])
 
     const handleSave = async () => {
+        if (Number(itemID) == 0) {
+            showToast("Select Item", "error");
+            return;
+        }
+        if (qty == 0) {
+            showToast("Enter Quantity", "error");
+            return;
+        }
+        if (Number(mrp) == 0) {
+            showToast("Enter MRP", "error");
+            return;
+        }
+        if (barCode == "") {
+            showToast("Enter Barcode", "error");
+            return;
+        }
         try {
+            const { data: bcExists } = await api.get(`${urls.checkDuplicateBarcode}?barcode=${barCode}`)
+            if (bcExists.resultStatus == "success") {
+                if (bcExists.exists) {
+                    showToast("Barcode Already Exists", "error");
+                    return;
+                }
+            }
+            if (partNumber != "") {
+                const { data: pnExists } = await api.get(`${urls.checkDuplicatePartNumber}?partNumber=${partNumber}`)
+                if (pnExists.resultStatus == "success") {
+                    if (pnExists.exists) {
+                        showToast("PartNumber Already Exists", "error");
+                        return;
+                    }
+                }
+            }
             const StockData = {
                 itemID: Number(itemID),
                 itemName: itemName,
@@ -133,7 +161,7 @@ const StockEntry = () => {
                 makeID: isUniversalChecked ? 0 : Number(makeID),
                 modelID: isUniversalChecked ? 0 : Number(modelID),
                 isUniversal: isUniversalChecked ? 1 : 0,
-                partNumber:partNumber
+                partNumber: partNumber
             }
 
             const { data } = await api.post(urls.insertStock, {
@@ -192,6 +220,7 @@ const StockEntry = () => {
                         <CustomFormLabel text={"Item"} />
                         <Grid item flex={1}>
                             <CustomTextField value={itemName}
+                                placeholder={"Press Enter To List Items......"}
                                 handleChange={(e) => setItemName(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
