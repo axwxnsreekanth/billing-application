@@ -15,7 +15,7 @@ const BillingScreen = () => {
   const [isUniversalChecked, setIsUniversalChecked] = useState(false);
   const [categoryID, setCategoryID] = useState(0);
   const [category, setCategory] = useState([]);
-  const [newMakeList, setNewMakeList] = useState([]);
+  const [customer, setCustomer] = useState('');
   const [make, setMake] = useState(0);
   const [open, setOpen] = useState(false);
   const [itemList, setItemList] = useState([]);
@@ -78,7 +78,12 @@ const BillingScreen = () => {
       quantity: qty,
       barcode: details.Barcode,
       partnumber: details.PartNumber,
-      categoryid: details.CategoryID
+      categoryid: details.CategoryID,
+      make:details.Make,
+      makeid:details.MakeID,
+      model:details.Model,
+      modelid:details.ModelID,
+      isuniversal:details.IsUniversal
     }
     newKart.push(temp)
     setKart(newKart);
@@ -225,7 +230,7 @@ const BillingScreen = () => {
         consumables: Number(consumables),
         lathework: Number(lathework),
         technician: technician,
-        billedBy: billedBy,
+        customer: customer,
         totalamount: finalAmount,
         items: kart.map(item => ({
           stockID: Number(item.stockid),
@@ -236,7 +241,12 @@ const BillingScreen = () => {
           quantity: Number(item.quantity),
           barCode: item.barcode,
           partNumber: item.partnumber,
-          amount: item.amount
+          amount: Number(item.amount),
+          make:item.make,
+          makeid:Number(item.makeid),
+          model:item.model,
+          modelid:Number(item.modelid),
+          isuniversal:Number(item.isuniversal)
         }))
 
       };
@@ -497,10 +507,10 @@ const BillingScreen = () => {
         </Grid>
         <Grid container size={{ md: 6, lg: 6 }} alignItems={"center"}>
           <Grid item>
-            <CustomFormLabel text={"Billed By"} />
+            <CustomFormLabel text={"Customer"} />
           </Grid>
           <Grid item flex={1}>
-            <CustomTextField value={billedBy} handleChange={(e) => setBilledBy(e.target.value)} />
+            <CustomTextField value={customer} handleChange={(e) => setCustomer(e.target.value)} />
           </Grid>
         </Grid>
         <Grid container size={{ md: 6, lg: 3 }} alignItems={"center"}>

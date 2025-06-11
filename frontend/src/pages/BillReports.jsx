@@ -1,17 +1,27 @@
 import React from "react";
-import { Box, Typography, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell,TextField } from "@mui/material";
+import { Box, Typography, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, TextField } from "@mui/material";
 import { CustomDropDown, CustomFormLabel, CustomTextField, CustomDateField } from '../components'
 import { useState, useEffect } from "react";
+import api from "../services/api";
+import urls from "../services/urls";
+import { useToast } from "../components/Popup/ToastProvider";
+import { KeyboardArrowDown, KeyboardArrowUp, Delete as DeleteIcon } from '@mui/icons-material';
 
 function BillReport() {
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
+    const [dateList, setDateList] = useState([]);
     const [currentDate, setCurrentDate] = useState('');
+    const [openRows, setOpenRows] = useState({});
+    const { showToast } = useToast();
+
+    const toggleRow = (index) => {
+        setOpenRows(prev => ({ ...prev, [index]: !prev[index] }));
+    };
     useEffect(() => {
         const fetchDate = async () => {
             const today = new Date();
             const formattedDate = today.toISOString().split('T')[0];
-            console.log("date", formattedDate)
             setCurrentDate(formattedDate);
             if (dateFrom != formattedDate) {
                 setDateFrom(formattedDate);
@@ -22,6 +32,22 @@ function BillReport() {
         };
         fetchDate();
     }, []);
+
+
+    const getbillingReports = async () => {
+        try {
+            const { data } = await api.get(`${urls.getBillReports}?dateFrom=${dateFrom}&dateTo=${dateTo}&paymentMode=0`);
+            console.log("dataaa", data)
+            if (data.resultStatus === 'success') {
+
+            }
+        }
+        catch (err) {
+            showToast("Failed,Something went wrong", "error");
+        }
+    }
+
+
     return (
         <Grid container height="100%" direction={"column"} spacing={1} padding={1}>
             <Box
@@ -70,6 +96,7 @@ function BillReport() {
                                 ml: 1,
                                 mr: 1,
                             }}
+                            onClick={getbillingReports}
                         >Show</Button>
                     </Grid>
                 </Grid>

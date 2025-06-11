@@ -326,7 +326,7 @@ const StockEdit = () => {
                 }}
             >
                 <Grid container direction={"row"} spacing={2}  >
-                    <Grid container size={{ md: 6, lg: 6 }} alignItems={"center"}>
+                    <Grid container size={{xs:12,sm:12, md: 6, lg: 6 }} alignItems={"center"}>
                         <Grid item>
                             <CustomFormLabel text={"Barcode"} />
                         </Grid>
@@ -335,7 +335,7 @@ const StockEdit = () => {
                                 handleChange={(e) => setBarCodeSearch(e.target.value)} handleSearch={handleBarcodeSearch} />
                         </Grid>
                     </Grid>
-                    <Grid container size={{ md: 6, lg: 6 }} alignItems={"center"}>
+                    <Grid container size={{xs:12,sm:12, md: 6, lg: 6 }} alignItems={"center"}>
                         <Grid item>
                             <CustomFormLabel text={"PartNumber"} />
                         </Grid>
@@ -372,9 +372,7 @@ const StockEdit = () => {
                         </Grid>
                     </Grid>
 
-                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 2 }} alignItems={"center"}>
-                        <CustomFormLabel text={""} />
-                        <Grid item flex={1} justifyContent={"flex-end"}>
+                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 2 }} alignItems={"center"} justifyContent={"center"}>
                             <FormControlLabel
                                 control={
                                     <Checkbox
@@ -385,7 +383,6 @@ const StockEdit = () => {
                                 }
                                 label="Universal"
                             />
-                        </Grid>
                     </Grid>
                     <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 4 }} alignItems={"center"}>
                         <CustomFormLabel text={"Make"} />
