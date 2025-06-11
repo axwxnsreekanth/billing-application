@@ -18,7 +18,7 @@ export const ItemPopup = ({ open, onClose, onSelect, items = [] }) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const focusRef = useRef(null);
     const rowRefs = useRef([]);
-
+    console.log("lis",items)
     // Auto-focus the dialog content
     useEffect(() => {
         if (open) {

@@ -27,6 +27,9 @@ app.use('/stock', stockRoutes);
 const billRoutes = require('./routes/billRoutes');
 app.use('/bill', billRoutes);
 
+const dashboardRoutes = require('./routes/dashboardRoutes');
+app.use('/dashboard', dashboardRoutes);
+
 // Optional: centralized error handling
 // const errorHandler = require('./middlewares/errorHandler');
 // app.use(errorHandler);

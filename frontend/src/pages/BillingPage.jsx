@@ -216,8 +216,16 @@ const BillingScreen = () => {
       showToast("Enter Received Amount", "error");
       return;
     }
+    if(customer==""){
+      showToast("Enter Customer Name","error");
+      return;
+    }
     if (parseFloat(finalAmount) < parseFloat(receivedAmount)) {
       showToast("Received Amount Is Greater Than Final Amount", "error");
+      return;
+    }
+    if(parseFloat(labour)!=0 && technician==""){
+        showToast("Enter Technician", "error");
       return;
     }
 
@@ -275,7 +283,8 @@ const BillingScreen = () => {
     setPaymentMode(1);
     setLathework(0);
     setReceivedAmount(0);
-    setKart([])
+    setKart([]);
+    setCustomer('');
   }
 
 

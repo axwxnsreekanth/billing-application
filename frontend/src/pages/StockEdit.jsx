@@ -48,7 +48,7 @@ const StockEdit = () => {
 
     const getItems = async () => {
         try {
-            const { data } = await api.get(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
+            const { data } = await api.get(`${urls.getAllItems}?itemName=${itemName}&categoryID=${categoryID}`)
             if (data.resultStatus == 'success') {
                 setItemList(data.data);
                 setOpen(true)

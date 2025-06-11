@@ -34,7 +34,10 @@ const urls = {
     stockDetailsByCategory: "/stock/stockDetailsByCategory",
     checkDuplicateBarcode: "/stock/duplicateBarcode",
     checkDuplicatePartNumber: "/stock/duplicatePartNumber",
-    getBillReports:"/bill/billReports"
+    getBillReports:"/bill/billReports",
+    getLabourReports:"/bill/labourReports",
+    getRecentSales:"dashboard/recent",
+    getZeroStock:"/dashboard/zerostock"
 }
 
 export default urls;

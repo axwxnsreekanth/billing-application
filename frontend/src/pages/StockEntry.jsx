@@ -42,9 +42,12 @@ const StockEntry = () => {
 
     const getItems = async () => {
         try {
-            const { data } = await api.get(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
+            console.log("item",itemName)
+            const { data } = await api.get(`${urls.getAllItems}?itemName=${itemName}&categoryID=${categoryID}`)
+            console.log(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
             if (data.resultStatus == 'success') {
                 setItemList(data.data);
+                console.log("itemsssssss",data.data)
                 setOpen(true)
             }
         }

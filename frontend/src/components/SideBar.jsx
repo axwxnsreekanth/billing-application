@@ -25,16 +25,18 @@ import CategoryIcon from '@mui/icons-material/Category';
 import StockEdit from '../pages/StockEdit';
 import WarehouseRoundedIcon from '@mui/icons-material/WarehouseRounded';
 import MopedRoundedIcon from '@mui/icons-material/MopedRounded';
+import LabourReport from '../pages/LabourReport';
+import Dashboard from '../pages/DashBoard';
 const NAVIGATION = [
   {
     kind: 'header',
     title: '',
   },
-  // {
-  //   segment: 'dashboard',
-  //   title: 'Dashboard',
-  //   icon: <DashboardIcon />,
-  // },
+  {
+    segment: 'dashboard',
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
   {
     segment: 'orders',
     title: 'Billing',
@@ -138,8 +140,8 @@ function useDemoRouter(initialPath) {
 
 function renderPage(pathname) {
   switch (pathname) {
-    // case '/dashboard':
-    //   return <BillingScreen />;
+    case '/dashboard':
+      return <Dashboard />;
     case '/orders':
       return <BillingScreen />;
     case '/vehicle/make':
@@ -152,6 +154,8 @@ function renderPage(pathname) {
       return <ItemScreen />;
     case '/reports/bill':
       return <BillReport />;
+    case '/reports/labour':
+      return <LabourReport />;
     case '/stock/add':
       return <StockEntry />;
     case '/stock/edit':
