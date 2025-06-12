@@ -93,7 +93,7 @@ exports.insertBillDetails = async (req, res) => {
     }
 
     await transaction.commit();
-    res.send({ message: 'success',invoice: invoiceNo });
+    res.send({ message: 'success', invoice: invoiceNo });
 
   } catch (err) {
     console.error(err);
@@ -123,9 +123,6 @@ exports.getBillReport = async (req, res) => {
 
     // Extract raw JSON string (usually in the "" column key)
     const rawJson = result.recordset?.[0]?.BillReportsJson || '[]';
-
-   
-
     // Convert to real JS array
     const parsed = JSON.parse(rawJson);
 
@@ -156,6 +153,34 @@ exports.getLabourReport = async (req, res) => {
     res.status(200).json({
       resultStatus: 'success',
       data: result.recordset
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      resultStatus: 'error',
+      message: 'Server error',
+      error: err.message
+    });
+  }
+};
+
+exports.getBillDetails = async (req, res) => {
+  try {
+    const { invoiceNo} = req.query;
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input('invoiceNo', invoiceNo)
+      .execute('GetBillDetailsByInvoiceNo');
+
+    // Extract raw JSON string (usually in the "" column key)
+    const rawJson = result.recordset?.[0]?.BillReportsJson || '[]';
+    // Convert to real JS array
+    const parsed = JSON.parse(rawJson);
+
+    res.status(200).json({
+      resultStatus: 'success',
+      data: parsed
     });
   } catch (err) {
     console.error(err);

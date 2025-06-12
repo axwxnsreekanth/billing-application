@@ -37,7 +37,9 @@ const urls = {
     getBillReports:"/bill/billReports",
     getLabourReports:"/bill/labourReports",
     getRecentSales:"dashboard/recent",
-    getZeroStock:"/dashboard/zerostock"
+    getZeroStock:"/dashboard/zerostock",
+    getStockDetailsForExport:"stock/stockDetailsForExport",
+    getBillDetailsByInvoiceNo:"/bill/billDetailsByInvoiceNo"
 }
 
 export default urls;

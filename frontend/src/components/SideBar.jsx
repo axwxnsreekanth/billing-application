@@ -28,7 +28,10 @@ import WarehouseRoundedIcon from '@mui/icons-material/WarehouseRounded';
 import MopedRoundedIcon from '@mui/icons-material/MopedRounded';
 import LabourReport from '../pages/LabourReport';
 import Dashboard from '../pages/DashBoard';
+import StockDetails from '../pages/StockDetails';
 import { AppBar, Toolbar } from '@mui/material';
+import PreviewIcon from '@mui/icons-material/Preview';
+import BillReturn from '../pages/BillReturn';
 
 const NAVIGATION = [
 
@@ -39,7 +42,12 @@ const NAVIGATION = [
   },
   {
     segment: 'orders',
-    title: 'Billing',
+    title: 'Bill Entry',
+    icon: <PointOfSaleIcon />,
+  },
+  {
+    segment: 'billreturn',
+    title: 'Bill Return',
     icon: <PointOfSaleIcon />,
   },
   {
@@ -76,6 +84,11 @@ const NAVIGATION = [
         segment: 'edit',
         title: 'Edit Stock',
         icon: <EditNoteIcon />,
+      },
+      {
+        segment: 'view',
+        title: 'View Stock',
+        icon: <PreviewIcon />,
       },
     ],
   },
@@ -158,6 +171,8 @@ function renderPage(pathname) {
       return <Dashboard />;
     case '/orders':
       return <BillingScreen />;
+    case '/billreturn':
+      return <BillReturn />;
     case '/vehicle/make':
       return <VehicleMake />;
     case '/vehicle/model':
@@ -174,6 +189,8 @@ function renderPage(pathname) {
       return <StockEntry />;
     case '/stock/edit':
       return <StockEdit />;
+    case '/stock/view':
+      return <StockDetails />;
     default:
       return <div>Page not found</div>;
   }

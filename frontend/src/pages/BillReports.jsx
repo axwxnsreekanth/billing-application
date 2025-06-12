@@ -95,7 +95,6 @@ function BillReport() {
         }
         try {
             const { data } = await api.get(`${urls.getBillReports}?dateFrom=${dateFrom}&dateTo=${dateTo}&paymentMode=${paymentMode}`);
-            console.log("dataaa", data)
             if (data.resultStatus === 'success') {
                 setDataList(data.data)
             }

@@ -341,3 +341,25 @@ exports.getDuplicatePartNumber = async (req, res) => {
         });
     }
 };
+
+exports.getStockDetailsForExport = async (req, res) => {
+    try {
+        const { itemName="" } = req.query;
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input('itemName', sql.VarChar, itemName)
+            .execute('GetStockDetailsForExport');
+        res.status(200).json({
+            resultStatus: 'success',
+            data: result.recordset
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            resultStatus: 'error',
+            message: 'Server error',
+            error: err.message
+        });
+    }
+};

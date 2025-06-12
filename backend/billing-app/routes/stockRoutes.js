@@ -16,4 +16,5 @@ router.get('/stockDetailsByItem', stockController.getStockDetailsByItem);
 router.get('/stockDetailsBycategory', stockController.getStockDetailsByCategory);
 router.get('/duplicateBarcode', stockController.getDuplicateBarcode);
 router.get('/duplicatePartNumber', stockController.getDuplicatePartNumber);
+router.get('/stockDetailsForExport', stockController.getStockDetailsForExport);
 module.exports = router;

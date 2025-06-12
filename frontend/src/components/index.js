@@ -11,3 +11,4 @@ export {ToastProvider} from "./Popup/ToastProvider";
 export {CustomTextFieldWithSearch} from "./Inputs/CustomTextFieldWithSearch";
 export {ConfirmDialog} from "./Popup/ConfirmationDialog";
 export {InfoDialog} from "./Popup/InfoDialog";
+export {CircularLoader} from "./Loader/CircularLoader";
