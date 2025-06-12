@@ -1,4 +1,5 @@
-import SideBar from '../src/components/SideBar'
+import '../src/custom.css';
+import SideBar from '../src/components/SideBar';
 import { ToastProvider } from './components';
 
 export default function App() {
@@ -7,7 +8,6 @@ export default function App() {
       <ToastProvider>
         <SideBar />
       </ToastProvider>
-
     </>
   );
 }

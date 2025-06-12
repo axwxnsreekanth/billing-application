@@ -9,6 +9,8 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const BillingScreen = () => {
   const { showToast } = useToast();
@@ -47,7 +49,16 @@ const BillingScreen = () => {
     { id: 1, description: "Cash" }, { id: 2, description: "UPI" }
   ]
   const [paymentMode, setPaymentMode] = useState(1);
+  const [currentDate, setCurrentDate] = useState('');
 
+  useEffect(() => {
+    const fetchDate = async () => {
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0];
+      setCurrentDate(formattedDate);
+    };
+    fetchDate();
+  }, []);
 
 
   const handleAddClick = (details) => {
@@ -79,11 +90,11 @@ const BillingScreen = () => {
       barcode: details.Barcode,
       partnumber: details.PartNumber,
       categoryid: details.CategoryID,
-      make:details.Make,
-      makeid:details.MakeID,
-      model:details.Model,
-      modelid:details.ModelID,
-      isuniversal:details.IsUniversal
+      make: details.Make,
+      makeid: details.MakeID,
+      model: details.Model,
+      modelid: details.ModelID,
+      isuniversal: details.IsUniversal
     }
     newKart.push(temp)
     setKart(newKart);
@@ -216,16 +227,16 @@ const BillingScreen = () => {
       showToast("Enter Received Amount", "error");
       return;
     }
-    if(customer==""){
-      showToast("Enter Customer Name","error");
+    if (customer == "") {
+      showToast("Enter Customer Name", "error");
       return;
     }
     if (parseFloat(finalAmount) < parseFloat(receivedAmount)) {
       showToast("Received Amount Is Greater Than Final Amount", "error");
       return;
     }
-    if(parseFloat(labour)!=0 && technician==""){
-        showToast("Enter Technician", "error");
+    if (parseFloat(labour) != 0 && technician == "") {
+      showToast("Enter Technician", "error");
       return;
     }
 
@@ -250,11 +261,11 @@ const BillingScreen = () => {
           barCode: item.barcode,
           partNumber: item.partnumber,
           amount: Number(item.amount),
-          make:item.make,
-          makeid:Number(item.makeid),
-          model:item.model,
-          modelid:Number(item.modelid),
-          isuniversal:Number(item.isuniversal)
+          make: item.make,
+          makeid: Number(item.makeid),
+          model: item.model,
+          modelid: Number(item.modelid),
+          isuniversal: Number(item.isuniversal)
         }))
 
       };
@@ -263,15 +274,120 @@ const BillingScreen = () => {
       })
       if (data.message == "success") {
         showToast("Bill Saved");
+        billData.invoiceNo = data.invoice;
+        printBillPdf(billData);
         handleReset();
       }
     }
     catch (err) {
-      showToast("Failed,Something went wrong","error");
+      showToast("Failed,Something went wrong", "error");
     }
 
 
   }
+
+
+
+  const printBillPdf = (billDetails) => {
+    const doc = new jsPDF();
+    const currentDate = new Date().toLocaleDateString();
+
+    // Outer border for the bill
+    const leftMargin = 10;
+    const topMargin = 15;
+    const rightMargin = 200;
+    const bottomMargin = 280;
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.rect(leftMargin, topMargin, rightMargin - leftMargin, bottomMargin - topMargin);
+
+    // Header
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Chaithanya', 105, 25, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Kaithakkal, Perambra', 105, 32, { align: 'center' });
+    doc.text('Phone: 9169168008', 105, 39, { align: 'center' });
+
+    // Invoice, date, customer info
+    const paymentModes = {
+      1: 'Cash',
+      2: 'UPI',
+      3: 'Card',
+    };
+
+    doc.setFontSize(11);
+    doc.text(`Invoice No: ${billDetails.invoiceNo}`, 14, 47);
+    doc.text(`Date: ${currentDate}`, 160, 47);
+    doc.text(`Customer: ${billDetails.customer}`, 14, 54);
+    doc.text(`Payment Mode: ${paymentModes[billDetails.paymentMode] || 'N/A'}`, 14, 61);
+
+    // Table data
+    const tableColumn = ['Sl.No', 'Item', 'Quantity', 'Amount'];
+    const tableRows = billDetails.items.map((item, index) => [
+      index + 1,
+      item.item,
+      item.quantity,
+      `₹${item.amount.toFixed(2)}`,
+    ]);
+
+    // Footer row for total
+    const totalRow = [
+      { content: 'Total Amount', colSpan: 3, styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: `₹${billDetails.totalamount.toFixed(2)}`, styles: { fontStyle: 'bold' } },
+    ];
+
+    // Render table with adjusted column widths
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      foot: [totalRow],
+      startY: 68,
+      margin: { left: 14, right: 14 },
+      styles: {
+        fontSize: 10,
+        halign: 'center',
+        lineColor: [0, 0, 0],
+        lineWidth: 0.2,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [230, 230, 230],
+        textColor: [0, 0, 0],
+        fontStyle: 'bold',
+      },
+      footStyles: {
+        fillColor: [245, 245, 245],
+        textColor: [0, 0, 0],
+      },
+      columnStyles: {
+        0: { cellWidth: '10%' },  // Sl.No
+        1: { cellWidth: '60%' },  // Item
+        2: { cellWidth: '15%' },  // Quantity
+        3: { cellWidth: '15%' },  // Amount
+      },
+      didDrawCell: (data) => {
+        // Vertical lines
+        if (data.column.index < data.table.columns.length - 1) {
+          const { x, y, height } = data.cell;
+          doc.setDrawColor(0);
+          doc.setLineWidth(0.2);
+          doc.line(x + data.cell.width, y, x + data.cell.width, y + height);
+        }
+      },
+    });
+
+    // Open in new tab
+    const blobUrl = doc.output('bloburl');
+    window.open(blobUrl, '_blank');
+  };
+
+
+
+
+
 
   const handleReset = () => {
     setStockData([]);

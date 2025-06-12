@@ -93,7 +93,7 @@ exports.insertBillDetails = async (req, res) => {
     }
 
     await transaction.commit();
-    res.send({ message: 'success', invoiceNo });
+    res.send({ message: 'success',invoice: invoiceNo });
 
   } catch (err) {
     console.error(err);

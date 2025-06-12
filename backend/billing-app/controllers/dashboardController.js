@@ -5,7 +5,7 @@ exports.getRecentSales = async (req, res) => {
         const pool = await poolPromise;
         const result = await pool
             .request()
-            .query('SELECT TOP 2 * FROM BILLDETAILS ORDER BY INVOICENO DESC');
+            .query('SELECT TOP 3 * FROM BILLDETAILS ORDER BY INVOICENO DESC');
         res.status(200).json({
             resultStatus: 'success',
             data: result.recordset
@@ -25,7 +25,7 @@ exports.getZeroStock = async (req, res) => {
         const pool = await poolPromise;
         const result = await pool
             .request()
-            .query('SELECT * FROM STOCKDETAILS WHERE QUANTITY=0');
+            .execute('GetItemsWithZeroStock');
         res.status(200).json({
             resultStatus: 'success',
             data: result.recordset

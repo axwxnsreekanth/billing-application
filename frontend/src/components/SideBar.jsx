@@ -2,13 +2,14 @@ import * as React from 'react';
 import { createTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { Box, Typography } from "@mui/material";
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import Grid from '@mui/material/Grid';
+import { useEffect } from 'react';
 import BillingScreen from '../pages/BillingPage'
 import VehicleMake from '../pages/VehicleMake';
 import VehicleModel from '../pages/Vehiclemodel';
@@ -27,11 +28,10 @@ import WarehouseRoundedIcon from '@mui/icons-material/WarehouseRounded';
 import MopedRoundedIcon from '@mui/icons-material/MopedRounded';
 import LabourReport from '../pages/LabourReport';
 import Dashboard from '../pages/DashBoard';
+import { AppBar, Toolbar } from '@mui/material';
+
 const NAVIGATION = [
-  {
-    kind: 'header',
-    title: '',
-  },
+
   {
     segment: 'dashboard',
     title: 'Dashboard',
@@ -109,23 +109,37 @@ const NAVIGATION = [
 ];
 
 const demoTheme = createTheme({
-  colorSchemes: { light: true, dark: true },
-  cssVariables: {
-    colorSchemeSelector: 'class',
+  palette: {
+    mode: 'light',
+    background: {
+      default: 'light', // light grey page background
+      paper: '#ffffff',   // white for cards/paper
+    },
   },
   breakpoints: {
     values: {
       xs: 0,
       sm: 600,
-      md: 600,
+      md: 900,
       lg: 1200,
       xl: 1536,
     },
   },
 });
 
+
+
+
 function useDemoRouter(initialPath) {
   const [pathname, setPathname] = React.useState(initialPath);
+  useEffect(() => {
+    const titleElement = document.querySelector(
+      'header .MuiStack-root.css-m69qwo-MuiStack-root > a > div > h6'
+    );
+    if (titleElement) {
+      titleElement.innerText = 'BillingApp'; // 👈 Your custom name here
+    }
+  }, []);
 
   const router = React.useMemo(() => {
     return {
@@ -181,12 +195,34 @@ export default function SideBar(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout>
+      <DashboardLayout
+        appBarContent={
+          <AppBar
+            position="static"
+            elevation={0}
+            sx={{ backgroundColor: 'white', boxShadow: 'none' }}
+          >
+            <Toolbar variant="dense" sx={{ justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', pl: 1 }}>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{ fontWeight: 'bold', color: '#1976d2' }}
+                >
+                  BillingApp
+                </Typography>
+              </Box>
+            </Toolbar>
+          </AppBar>
+        }
+        appBarActions={<></>}
+      >
         <PageContainer title="">
-
           {renderPage(router.pathname)}
         </PageContainer>
       </DashboardLayout>
+
+
     </AppProvider>
   );
 }

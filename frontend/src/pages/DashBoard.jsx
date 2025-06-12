@@ -3,6 +3,7 @@ import { Grid, Card, CardContent, Typography, Table, TableBody, TableCell, Table
 import { TrendingUp, Inventory2 } from '@mui/icons-material';
 import api from "../services/api";
 import urls from "../services/urls";
+import { motion } from 'framer-motion';
 
 const Dashboard = () => {
     const [topSales, setTopSales] = useState([]);
@@ -16,7 +17,6 @@ const Dashboard = () => {
                     api.get(urls.getRecentSales),
                     api.get(urls.getZeroStock),
                 ]);
-                console.log("sa", stockRes.data)
                 setTopSales(salesRes.data.data);
                 setOutOfStock(stockRes.data.data);
             } catch (error) {
@@ -42,85 +42,104 @@ const Dashboard = () => {
                 height: "100%",
             }}
         >
-            <Grid container direction="column" spacing={3} padding={3} height={"100%"} alignItems={"space-evenly"} >
-                {/* Top Sales Section */}
-                <Grid item xs={12} mb={2}>
-                    <Card elevation={4}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                <TrendingUp color="primary" sx={{ mr: 1 }} />
-                                Recent 2 Sales
-                            </Typography>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>#</TableCell>
-                                        <TableCell>Customer</TableCell>
-                                        <TableCell>Date</TableCell>
-                                        <TableCell>Amount</TableCell>
-                                        <TableCell>Invoice No</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {topSales.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center">No sales data</TableCell>
+            <Grid container spacing={4} padding={2} direction="column">
+
+                {/* Recent Sales */}
+                <Grid item xs={12}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <Card sx={{ borderRadius: 4, boxShadow: 6 }}>
+                            <CardContent>
+                                <Box display="flex" alignItems="center" mb={2}>
+                                    <TrendingUp color="primary" sx={{ fontSize: 28, mr: 1 }} />
+                                    <Typography variant="h6" fontWeight="bold">Recent Sales</Typography>
+                                </Box>
+                                <Table size="small">
+                                    <TableHead>
+                                        <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                            <TableCell>#</TableCell>
+                                            <TableCell>Customer</TableCell>
+                                            <TableCell>Date</TableCell>
+                                            <TableCell>Amount</TableCell>
+                                            <TableCell>Invoice</TableCell>
                                         </TableRow>
-                                    ) : (
-                                        topSales.map((sale, index) => (
-                                            <TableRow key={sale.BillID}>
-                                                <TableCell>{index + 1}</TableCell>
-                                                <TableCell>{sale.Customer}</TableCell>
-                                                <TableCell>{new Date(sale.BillDate).toLocaleDateString()}</TableCell>
-                                                <TableCell>₹{sale.TotalAmount}</TableCell>
-                                                <TableCell>{sale.Invoiceno}</TableCell>
+                                    </TableHead>
+                                    <TableBody>
+                                        {topSales.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={5} align="center">No sales data</TableCell>
                                             </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
+                                        ) : (
+                                            topSales.map((sale, index) => (
+                                                <TableRow key={sale.BillID}>
+                                                    <TableCell>{index + 1}</TableCell>
+                                                    <TableCell>{sale.Customer}</TableCell>
+                                                    <TableCell>{new Date(sale.BillDate).toLocaleDateString()}</TableCell>
+                                                    <TableCell>
+                                                        <Typography fontWeight="bold" color="success.main">
+                                                            ₹{sale.ReceivedAmount}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>{sale.Invoiceno}</TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
                 </Grid>
 
-                {/* Out of Stock Section */}
+                {/* Out of Stock Items */}
                 <Grid item xs={12}>
-                    <Card elevation={4}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                <Inventory2 color="error" sx={{ mr: 1 }} />
-                                Out of Stock Items
-                            </Typography>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>#</TableCell>
-                                        <TableCell>Item</TableCell>
-                                        <TableCell>Category</TableCell>
-                                        <TableCell>Model</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {outOfStock.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center">All items in stock</TableCell>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <Card sx={{ borderRadius: 4, boxShadow: 6 }}>
+                            <CardContent>
+                                <Box display="flex" alignItems="center" mb={2}>
+                                    <Inventory2 color="error" sx={{ fontSize: 28, mr: 1 }} />
+                                    <Typography variant="h6" fontWeight="bold">Out of Stock</Typography>
+                                </Box>
+                                <Table size="small">
+                                    <TableHead>
+                                        <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                            <TableCell>#</TableCell>
+                                            <TableCell>Item</TableCell>
+                                            <TableCell>Category</TableCell>
+                                            <TableCell>Barcode</TableCell>
                                         </TableRow>
-                                    ) : (
-                                        outOfStock.map((item, index) => (
-                                            <TableRow key={item.StockID || index}>
-                                                <TableCell>{index + 1}</TableCell>
-                                                <TableCell>{item.Item}</TableCell>
-                                                <TableCell>{item.Category}</TableCell>
-                                                <TableCell>{item.Model || '-'}</TableCell>
+                                    </TableHead>
+                                    <TableBody>
+                                        {outOfStock.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={4} align="center">All items in stock</TableCell>
                                             </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
+                                        ) : (
+                                            outOfStock.map((item, index) => (
+                                                <TableRow key={ index}>
+                                                    <TableCell>{index + 1}</TableCell>
+                                                    <TableCell>{item.Item}</TableCell>
+                                                    <TableCell>{item.Category}</TableCell>
+                                                    <TableCell>{item.Barcode || '-'}</TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
                 </Grid>
-            </Grid >
+
+            </Grid>
+
         </Box>
 
     );

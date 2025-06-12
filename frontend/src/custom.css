@@ -1,0 +1,16 @@
+/* ✅ Hide only the Toolpad icon (inside the logo link) */
+header .MuiStack-root.css-m69qwo-MuiStack-root > a > div > div > svg {
+  display: none !important;
+}
+
+/* ✅ Optional: restyle or override Toolpad text */
+header .MuiStack-root.css-m69qwo-MuiStack-root > a > div > h6 {
+  color: deepskyblue  !important;
+  font-weight: bold !important;
+  font-size: 1.1rem !important;
+}
+
+/* ✅ Remove light/dark toggle button */
+header .MuiStack-root.css-1faxzrb-MuiStack-root > div > div > button {
+  display: none !important;
+}
