@@ -39,7 +39,9 @@ const urls = {
     getRecentSales:"dashboard/recent",
     getZeroStock:"/dashboard/zerostock",
     getStockDetailsForExport:"stock/stockDetailsForExport",
-    getBillDetailsByInvoiceNo:"/bill/billDetailsByInvoiceNo"
+    getBillDetailsByInvoiceNo:"/bill/billDetailsByInvoiceNo",
+    saveBillReturn:"/bill/saveBillReturn",
+    getBillReturnReports:"/bill/billReturnReports",
 }
 
 export default urls;

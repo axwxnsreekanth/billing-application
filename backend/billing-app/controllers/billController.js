@@ -166,12 +166,93 @@ exports.getLabourReport = async (req, res) => {
 
 exports.getBillDetails = async (req, res) => {
   try {
-    const { invoiceNo} = req.query;
+    const { invoiceNo } = req.query;
     const pool = await poolPromise;
     const result = await pool
       .request()
       .input('invoiceNo', invoiceNo)
       .execute('GetBillDetailsByInvoiceNo');
+
+    // Extract raw JSON string (usually in the "" column key)
+    const rawJson = result.recordset?.[0]?.BillReportsJson || '[]';
+    // Convert to real JS array
+    const parsed = JSON.parse(rawJson);
+
+    res.status(200).json({
+      resultStatus: 'success',
+      data: parsed
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      resultStatus: 'error',
+      message: 'Server error',
+      error: err.message
+    });
+  }
+};
+
+exports.saveBillReturn = async (req, res) => {
+  try {
+    const { billData } = req.body;
+    const pool = await poolPromise;
+    const transaction = new sql.Transaction(pool);
+
+    await transaction.begin();
+    const request = new sql.Request(transaction);
+    if (billData.fullReturn == 1) {
+      await request
+        .input('billID', sql.Int, billData.billID)
+        .query(`
+          UPDATE BILLDETAILS SET BILLRETURNED = 1 WHERE BILLID = @billID;
+          UPDATE BILLEDITEMDETAILS SET BILLRETURNED = 1 WHERE BILLID = @billID;
+        `);
+    } else {
+      for (const id of billData.billID) {
+        await request
+          .input('id', sql.Int, id.id)
+          .input('billID', sql.Int, id.billid)
+          .query(`
+            UPDATE BILLEDITEMDETAILS SET BILLRETURNED = 1 
+            WHERE BILLID = @billID AND ID = @id;
+          `);
+        request.parameters = {}; // clear parameters after each query
+      }
+    }
+
+    await transaction.commit();
+
+    res.status(200).json({
+      resultStatus: 'success',
+      message: 'Bill return processed successfully'
+    });
+
+  } catch (err) {
+    console.error('Transaction error:', err);
+
+    try {
+      if (transaction) await transaction.rollback();
+    } catch (rollbackErr) {
+      console.error('Rollback failed:', rollbackErr);
+    }
+
+    res.status(500).json({
+      resultStatus: 'error',
+      message: 'Server error',
+      error: err.message
+    });
+  }
+};
+
+exports.getBillReturnReport = async (req, res) => {
+  try {
+    const { dateFrom, dateTo } = req.query;
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input('FromDate', dateFrom)
+      .input('ToDate', dateTo)
+      .execute('GetBillReturnReports');
 
     // Extract raw JSON string (usually in the "" column key)
     const rawJson = result.recordset?.[0]?.BillReportsJson || '[]';

@@ -30,7 +30,7 @@ const BillReturn = () => {
     const [qty, setQty] = useState(0)
     const [barCode, setBarCode] = useState('')
     const [partNumber, setPartNumber] = useState('')
-    const [invoiceNo, setInvoiceNo] = useState(0)
+    const [invoiceNo, setInvoiceNo] = useState('')
     const [partNumberSearch, setPartNumberSearch] = useState('')
     const [stockData, setStockData] = useState([]);
     const [stockID, setStockID] = useState(0);
@@ -88,7 +88,7 @@ const BillReturn = () => {
                 showToast("Enter InvoiceNo", "warning");
                 return;
             }
-            const { data } = await api.get(`${urls.getBillDetailsByInvoiceNo}?invoiceNo=${invoiceNo}`);
+            const { data } = await api.get(`${urls.getBillDetailsByInvoiceNo}?invoiceNo=${parseInt(invoiceNo)}`);
             if (data.resultStatus === "success") {
                 if (data.data.length == 0) {
                     showToast(`Bill With Invoice ${invoiceNo} Not Found`, "error");
@@ -105,73 +105,37 @@ const BillReturn = () => {
 
 
 
-    //   const handleSave = async () => {
-    //     if (kart.length == 0) {
-    //       showToast("Enter Items", "error");
-    //       return;
-    //     }
-    //     if (receivedAmount == 0) {
-    //       showToast("Enter Received Amount", "error");
-    //       return;
-    //     }
-    //     if (customer == "") {
-    //       showToast("Enter Customer Name", "error");
-    //       return;
-    //     }
-    //     if (parseFloat(finalAmount) < parseFloat(receivedAmount)) {
-    //       showToast("Received Amount Is Greater Than Final Amount", "error");
-    //       return;
-    //     }
-    //     if (parseFloat(labour) != 0 && technician == "") {
-    //       showToast("Enter Technician", "error");
-    //       return;
-    //     }
-
-    //     try {
-    //       const billData = {
-    //         amount: Number(receivedAmount),
-    //         paymentMode: Number(paymentMode),
-    //         labour: Number(labour),
-    //         industry: Number(industry),
-    //         consumables: Number(consumables),
-    //         lathework: Number(lathework),
-    //         technician: technician,
-    //         customer: customer,
-    //         totalamount: finalAmount,
-    //         items: kart.map(item => ({
-    //           stockID: Number(item.stockid),
-    //           itemID: Number(item.itemid),
-    //           item: item.itemname,
-    //           categoryID: Number(item.categoryid),
-    //           category: item.categoryname,
-    //           quantity: Number(item.quantity),
-    //           barCode: item.barcode,
-    //           partNumber: item.partnumber,
-    //           amount: Number(item.amount),
-    //           make: item.make,
-    //           makeid: Number(item.makeid),
-    //           model: item.model,
-    //           modelid: Number(item.modelid),
-    //           isuniversal: Number(item.isuniversal)
-    //         }))
-
-    //       };
-    //       const { data } = await api.post(urls.insertBillDetails, {
-    //         billData: billData
-    //       })
-    //       if (data.message == "success") {
-    //         showToast("Bill Saved");
-    //         billData.invoiceNo = data.invoice;
-    //         printBillPdf(billData);
-    //         handleReset();
-    //       }
-    //     }
-    //     catch (err) {
-    //       showToast("Failed,Something went wrong", "error");
-    //     }
-
-
-    //   }
+      const handleSave = async () => {
+        if (returnKart.length == 0) {
+          showToast("Enter Items", "error");
+          return;
+        }
+        let returnBill={};
+        if(returnKart.length==billData.Items.length){
+            returnBill.billID=billData.BillID;
+            returnBill.fullReturn=1;
+        }
+        else{
+            returnBill.billID=returnKart.map((item)=>({
+                id:item.id,
+                billid:billData.BillID
+            }))
+            returnBill.fullReturn=0;
+        }
+        try{
+            const {data}=await api.put(urls.saveBillReturn,{billData:returnBill})
+            if(data.resultStatus=="success"){
+                showToast("Bill Saved","success")
+                handleReset();
+            }
+            else{
+                showToast("Failed to save","error")
+            }
+        }
+        catch(err){
+            showToast("Failed to save","error")
+        }
+      }
 
 
     const handleReset = () => {
@@ -185,7 +149,9 @@ const BillReturn = () => {
         setLathework(0);
         setReceivedAmount(0);
         setKart([]);
+        setReturnKart([]);
         setCustomer('');
+        setInvoiceNo('');
     }
 
 
@@ -299,7 +265,7 @@ const BillReturn = () => {
                         ml: 1,
                         mr: 1,
                     }}
-
+                    onClick={handleSave}
                 >
                     Save
                 </Button>

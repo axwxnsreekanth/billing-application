@@ -15,7 +15,7 @@ import VehicleMake from '../pages/VehicleMake';
 import VehicleModel from '../pages/Vehiclemodel';
 import CategoryScreen from '../pages/CategoryScreen';
 import ItemScreen from '../pages/ItemScreen';
-import BillReport from '../pages/BillReports';
+import BillReport from '../pages/BillReport';
 import StockEntry from '../pages/StockEntry';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -32,6 +32,8 @@ import StockDetails from '../pages/StockDetails';
 import { AppBar, Toolbar } from '@mui/material';
 import PreviewIcon from '@mui/icons-material/Preview';
 import BillReturn from '../pages/BillReturn';
+import BillReturnReport from '../pages/BillReturnReport';
+import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 
 const NAVIGATION = [
 
@@ -48,7 +50,7 @@ const NAVIGATION = [
   {
     segment: 'billreturn',
     title: 'Bill Return',
-    icon: <PointOfSaleIcon />,
+    icon: <ProductionQuantityLimitsIcon />,
   },
   {
     segment: 'reports',
@@ -58,6 +60,11 @@ const NAVIGATION = [
       {
         segment: 'bill',
         title: 'Billing',
+        icon: <DescriptionIcon />,
+      },
+      {
+        segment: 'billreturn',
+        title: 'Bill Return',
         icon: <DescriptionIcon />,
       },
       {
@@ -183,6 +190,8 @@ function renderPage(pathname) {
       return <ItemScreen />;
     case '/reports/bill':
       return <BillReport />;
+    case '/reports/billreturn':
+      return <BillReturnReport />;
     case '/reports/labour':
       return <LabourReport />;
     case '/stock/add':
