@@ -2,7 +2,6 @@ import '../src/custom.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastProvider } from './components';
 import { AuthProvider, useAuth } from './context/authContext';
-import DashboardLayout from './components/DashboardLayout';
 import Login from './pages/LoginPage';
 import Dashboard from './pages/DashBoard';
 import BillingScreen from './pages/BillingPage';
@@ -56,7 +55,7 @@ function AppRoutes() {
           <Route path="stock/add" element={<StockEntry />} />
           <Route path="stock/edit" element={<StockEdit />} />
           <Route path="stock/view" element={<StockDetails />} />
-          {/* ...other nested routes */}
+  
         </Route>
       </Routes>
     </>
