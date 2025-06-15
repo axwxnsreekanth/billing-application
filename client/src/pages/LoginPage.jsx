@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useState } from 'react';
 import {
     Box,
@@ -7,7 +6,9 @@ import {
     Typography,
     Paper,
     Alert,
+    InputAdornment
 } from '@mui/material';
+import { LockOutlined, Person, Lock } from '@mui/icons-material';
 import api from "../services/api";
 import { useAuth } from '../context/authContext';
 import { useNavigate } from 'react-router-dom';
@@ -30,11 +31,8 @@ const Login = () => {
                 password,
             });
             const { token } = res.data;
-            console.log("token", token)
-            login(token); // set token and mark as authenticated
+            login(token);
             navigate('/dashboard', { replace: true });
-            // optionally update the path using your custom router
-            // navigate('/dashboard'); if you're using router.navigate
         } catch (err) {
             console.error(err)
             setError('Invalid username or password');
@@ -47,21 +45,41 @@ const Login = () => {
             justifyContent="center"
             alignItems="center"
             height="100vh"
-            bgcolor="#f5f5f5"
-            width={"100vw"}
+            width="100vw"
             sx={{
                 backgroundImage: `url(${loginPic})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
+                backdropFilter: 'blur(4px)',
             }}
         >
-            <Paper elevation={3} sx={{ padding: 4, width: 350,height:250 }}>
-           
+            <Paper
+                elevation={6}
+                sx={{
+                    padding: 4,
+                    width: 400,
+                    borderRadius: 4,
+                    backdropFilter: 'blur(12px)',
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                }}
+            >
+                <Box textAlign="center" mb={2}>
+                    <LockOutlined color="primary" fontSize="large" />
+                    <Typography variant="h5" fontWeight="bold" mt={1}>
+                        Welcome 
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                        Please login to continue
+                    </Typography>
+                </Box>
 
-                {error && <Alert severity="error">{error}</Alert>}
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
 
-                <Box component="form" onSubmit={handleLogin} mt={2}>
+                <Box component="form" onSubmit={handleLogin}>
                     <TextField
                         fullWidth
                         label="Username"
@@ -70,6 +88,13 @@ const Login = () => {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Person />
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <TextField
                         fullWidth
@@ -80,12 +105,19 @@ const Login = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Lock />
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <Button
                         fullWidth
                         type="submit"
                         variant="contained"
-                        sx={{ mt: 2 }}
+                        sx={{ mt: 3, py: 1.3, fontWeight: 'bold' }}
                     >
                         Login
                     </Button>
