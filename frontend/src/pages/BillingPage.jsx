@@ -1,46 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Grid, FormControlLabel, Checkbox, Table, TableContainer, TableRow, TableBody, TableHead, TableCell, TableFooter } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField, CustomTextFieldWithSearch, CustomQuantityTextField } from '../components'
+import { CustomDropDown, CustomFormLabel, CustomTextField, CustomTextFieldWithSearch } from '../components'
 import api from "../services/api";
 import urls from "../services/urls";
 import { useToast } from "../components/Popup/ToastProvider";
-import { ItemPopup } from "../components";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { ConfirmDialog } from "../components";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useAuth } from "../context/authContext";
 
 const BillingScreen = () => {
+  const { logout } = useAuth();
   const { showToast } = useToast();
   const [isUniversalChecked, setIsUniversalChecked] = useState(false);
-  const [categoryID, setCategoryID] = useState(0);
   const [category, setCategory] = useState([]);
   const [customer, setCustomer] = useState('');
   const [make, setMake] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [itemList, setItemList] = useState([]);
   const [itemName, setItemName] = useState('');
   const [itemID, setItemID] = useState(0);
   const [qoh, setQOH] = useState(0)
   const [mrp, setMrp] = useState(0)
-  const [modelList, setModelList] = useState([])
   const [model, setModel] = useState(0);
   const [qty, setQty] = useState(0)
-  const [barCode, setBarCode] = useState('')
-  const [partNumber, setPartNumber] = useState('')
   const [barCodeSearch, setBarCodeSearch] = useState('')
   const [partNumberSearch, setPartNumberSearch] = useState('')
   const [stockData, setStockData] = useState([]);
   const [stockID, setStockID] = useState(0);
-  const [openDialog, setOpenDialog] = useState(false);
   const [labour, setLabour] = useState(0);
   const [industry, setIndustry] = useState(0);
   const [consumables, setConsumables] = useState(0);
   const [lathework, setLathework] = useState(0);
   const [technician, setTechnician] = useState('');
-  const [billedBy, setBilledBy] = useState('');
   const [receivedAmount, setReceivedAmount] = useState(0);
   const [total, setTotal] = useState(0);
   const [finalAmount, setFinalAmount] = useState(0);
@@ -49,17 +40,6 @@ const BillingScreen = () => {
     { id: 1, description: "Cash" }, { id: 2, description: "UPI" }
   ]
   const [paymentMode, setPaymentMode] = useState(1);
-  const [currentDate, setCurrentDate] = useState('');
-
-  useEffect(() => {
-    const fetchDate = async () => {
-      const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0];
-      setCurrentDate(formattedDate);
-    };
-    fetchDate();
-  }, []);
-
 
   const handleAddClick = (details) => {
     if (details == null || stockID == 0 || itemID == 0) {
@@ -156,9 +136,7 @@ const BillingScreen = () => {
         const details = data.data;
         setQOH(details[0].Quantity);
         setMrp(details[0].MRP);
-        setBarCode(details[0].Barcode);
         setStockID(details[0].StockID);
-        setPartNumber(details[0].PartNumber);
         setItemName(details[0].Item);
         setItemID(details[0].ItemID);
         setCategory(details[0].Category);
@@ -174,6 +152,9 @@ const BillingScreen = () => {
       }
     }
     catch (err) {
+      if (err.response.status == 403) {
+        logout();
+      }
       showToast("Something went wrong", "error")
     }
   }
@@ -195,9 +176,7 @@ const BillingScreen = () => {
         const details = data.data;
         setQOH(details[0].Quantity);
         setMrp(details[0].MRP);
-        setBarCode(details[0].Barcode);
         setStockID(details[0].StockID);
-        setPartNumber(details[0].PartNumber);
         setItemName(details[0].Item);
         setItemID(details[0].ItemID);
         setCategory(details[0].Category);
@@ -213,6 +192,9 @@ const BillingScreen = () => {
       }
     }
     catch (err) {
+      if (err.response.status == 403) {
+        logout();
+      }
       showToast("Something went wrong", "error")
     }
   }
@@ -280,6 +262,9 @@ const BillingScreen = () => {
       }
     }
     catch (err) {
+      if (err.response.status == 403) {
+        logout();
+      }
       showToast("Failed,Something went wrong", "error");
     }
 
@@ -359,7 +344,7 @@ const BillingScreen = () => {
     const priceColumn = doc.lastAutoTable?.table?.columns?.[3];
     const labelX = priceColumn ? priceColumn.x : 120;
     const valueX = priceColumn ? priceColumn.x + priceColumn.width : 160;
-    let discount=parseFloat(billDetails.totalamount)-parseFloat(billDetails.amount);
+    let discount = parseFloat(billDetails.totalamount) - parseFloat(billDetails.amount);
     const summary = [
       { label: 'Labour', value: `${billDetails.labour.toFixed(2)}` },
       { label: 'Industrial', value: `${billDetails.industry.toFixed(2)}` },

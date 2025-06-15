@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, TableBody, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell } from "@mui/material";
 import { CustomDropDown, CustomFormLabel, CustomTextField } from '../components'
 import api from "../services/api";
@@ -11,8 +10,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
 import { InfoDialog } from "../components";
+import { useAuth } from "../context/authContext";
 
 function VehicleModel() {
+    const { logout } = useAuth();
     const { showToast } = useToast()
     const [modelList, setModelList] = useState([])
     const [makeList, setMakeList] = useState([])
@@ -54,7 +55,10 @@ function VehicleModel() {
                 }
             }
             catch (err) {
-                showToast("Failed,Something went wrong","error");
+                if (err.response.status == 403) {
+                    logout();
+                }
+                showToast("Session Expired", "error");
             }
         };
 
@@ -105,7 +109,7 @@ function VehicleModel() {
                 }
                 catch (err) {
                     showToast("Error Occured", "error")
-                   
+
                 }
             }
         }
@@ -153,7 +157,7 @@ function VehicleModel() {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            showToast("Failed,Something went wrong", "error");
         }
         finally {
             setOpenDialog(false);

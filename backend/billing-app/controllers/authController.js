@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const { sql, poolPromise } = require('../config/db');
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = '1m';
 
 exports.login = async (req, res) => {
   try {
@@ -21,28 +20,35 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ userId: user.UserID }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-    const now = new Date();
-    let expiry = new Date(Date.now() + 1 * 60 * 1000).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-    console.log("Now:     ", now.toISOString());
-    console.log("Expiry:  ", expiry);
-
-
-   // const expiry = new Date(Date.now() + 1 * 60 * 1000).toISOString();
-    // ISO format works better with SQL datetime
-
+    const token = jwt.sign({ userId: user.UserID }, JWT_SECRET);
 
     await pool.request()
       .input('userId', sql.Int, user.UserID)
       .input('token', sql.NVarChar, token)
-      .input('expiry', sql.DateTime, expiry)
-      .query('INSERT INTO Tokens (UserID, Token, Expiry) VALUES (@userId, @token, @expiry)');
+      .query('INSERT INTO Tokens (UserID, Token, IsRevoked) VALUES (@userId, @token, 0)');
+
 
     res.json({ token });
 
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error during login' });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) return res.status(400).json({ message: 'No token provided' });
+
+    const pool = await poolPromise;
+    await pool.request()
+      .input('token', sql.NVarChar, token)
+      .query('UPDATE Tokens SET IsRevoked = 1 WHERE Token = @token');
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (err) {
+    console.error('Logout error:', err);
+    res.status(500).json({ message: 'Logout failed' });
   }
 };

@@ -1,6 +1,5 @@
-import React from "react";
 import { Box, TableBody, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField } from '../components'
+import {  CustomFormLabel, CustomTextField } from '../components'
 import api from "../services/api";
 import urls from "../services/urls";
 import { useState, useEffect } from "react";

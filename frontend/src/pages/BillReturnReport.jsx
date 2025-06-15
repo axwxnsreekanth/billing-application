@@ -1,14 +1,15 @@
 import React from "react";
-import { Box, Typography, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, Paper, IconButton, Collapse, TableBody } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField, CustomDateField } from '../components'
+import { Box, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, Paper, IconButton, Collapse, TableBody } from "@mui/material";
+import { CustomFormLabel, CustomDateField } from '../components'
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import urls from "../services/urls";
 import { useToast } from "../components/Popup/ToastProvider";
 import { KeyboardArrowDown, KeyboardArrowUp, Delete as DeleteIcon } from '@mui/icons-material';
-
+import { useAuth } from "../context/authContext";
 
 const ExpandableRow = ({ row }) => {
+
     const [open, setOpen] = useState(false);
 
     return (
@@ -60,6 +61,7 @@ const ExpandableRow = ({ row }) => {
 };
 
 function BillReturnReport() {
+    const { logout } = useAuth();
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const [dataList, setDataList] = useState([]);
@@ -82,8 +84,8 @@ function BillReturnReport() {
 
 
     const getbillingReports = async () => {
-        if(dateFrom>dateTo){
-            showToast("Invalid Date Selection","error")
+        if (dateFrom > dateTo) {
+            showToast("Invalid Date Selection", "error")
             return;
         }
         try {
@@ -93,6 +95,9 @@ function BillReturnReport() {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Failed,Something went wrong", "error");
         }
     }
@@ -145,7 +150,7 @@ function BillReturnReport() {
                         >Show</Button>
                     </Grid>
                 </Grid>
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
                     <Table>
                         <TableHead sx={{ backgroundColor: '#F9F9F9' }}>
                             <TableRow>

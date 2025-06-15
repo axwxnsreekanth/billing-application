@@ -1,55 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Grid, FormControlLabel, Checkbox, Table, TableContainer, TableRow, TableBody, TableHead, TableCell, Typography } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField, CustomTextFieldWithSearch, CustomQuantityTextField } from '../components'
+import { Box, Button, Grid, Table, TableContainer, TableRow, TableBody, TableHead, TableCell, Typography } from "@mui/material";
+import { CustomFormLabel, CustomTextFieldWithSearch } from '../components'
 import api from "../services/api";
 import urls from "../services/urls";
 import { useToast } from "../components/Popup/ToastProvider";
-import { ItemPopup } from "../components";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { ConfirmDialog } from "../components";
+import { useAuth } from "../context/authContext";
 
 
 const BillReturn = () => {
+    const { logout } = useAuth();
     const { showToast } = useToast();
-    const [isUniversalChecked, setIsUniversalChecked] = useState(false);
     const [billData, setBillData] = useState([]);
-    const [category, setCategory] = useState([]);
-    const [customer, setCustomer] = useState('');
-    const [make, setMake] = useState(0);
-    const [open, setOpen] = useState(false);
-    const [itemList, setItemList] = useState([]);
-    const [itemName, setItemName] = useState('');
-    const [itemID, setItemID] = useState(0);
-    const [qoh, setQOH] = useState(0)
-    const [mrp, setMrp] = useState(0)
-    const [returnKart, setReturnKart] = useState([])
-    const [model, setModel] = useState(0);
-    const [qty, setQty] = useState(0)
-    const [barCode, setBarCode] = useState('')
-    const [partNumber, setPartNumber] = useState('')
-    const [invoiceNo, setInvoiceNo] = useState('')
-    const [partNumberSearch, setPartNumberSearch] = useState('')
-    const [stockData, setStockData] = useState([]);
-    const [stockID, setStockID] = useState(0);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [labour, setLabour] = useState(0);
-    const [industry, setIndustry] = useState(0);
-    const [consumables, setConsumables] = useState(0);
-    const [lathework, setLathework] = useState(0);
-    const [technician, setTechnician] = useState('');
-    const [billedBy, setBilledBy] = useState('');
-    const [receivedAmount, setReceivedAmount] = useState(0);
-    const [total, setTotal] = useState(0);
-    const [finalAmount, setFinalAmount] = useState(0);
+    const [returnKart, setReturnKart] = useState([]);
+    const [invoiceNo, setInvoiceNo] = useState('');
     const [kart, setKart] = useState([]);
-    const paymentModes = [
-        { id: 1, description: "Cash" }, { id: 2, description: "UPI" }
-    ]
-    const [paymentMode, setPaymentMode] = useState(1);
-    const [currentDate, setCurrentDate] = useState('');
 
     useEffect(() => {
         const fetchDate = async () => {
@@ -77,14 +43,14 @@ const BillReturn = () => {
     }
 
     const handleDeleteItem = (id) => {
-        const newKart = kart.filter(item => item.ID!= id)
+        const newKart = kart.filter(item => item.ID != id)
         setKart(newKart);
     }
 
 
     const handleSearch = async () => {
         try {
-            if (invoiceNo === 0) {
+            if (parseInt(invoiceNo) === 0) {
                 showToast("Enter InvoiceNo", "warning");
                 return;
             }
@@ -95,62 +61,60 @@ const BillReturn = () => {
                     return;
                 }
                 setKart(data.data[0].Items)
-               setBillData(data.data[0]);
+                setBillData(data.data[0]);
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Something went wrong", "error")
         }
     }
 
 
 
-      const handleSave = async () => {
+    const handleSave = async () => {
         if (returnKart.length == 0) {
-          showToast("Enter Items", "error");
-          return;
+            showToast("Enter Items", "error");
+            return;
         }
-        let returnBill={};
-        if(returnKart.length==billData.Items.length){
-            returnBill.billID=billData.BillID;
-            returnBill.fullReturn=1;
+        let returnBill = {};
+        if (returnKart.length == billData.Items.length) {
+            returnBill.billID = billData.BillID;
+            returnBill.fullReturn = 1;
         }
-        else{
-            returnBill.billID=returnKart.map((item)=>({
-                id:item.id,
-                billid:billData.BillID
+        else {
+            returnBill.billID = returnKart.map((item) => ({
+                id: item.id,
+                billid: billData.BillID
             }))
-            returnBill.fullReturn=0;
+            returnBill.fullReturn = 0;
         }
-        try{
-            const {data}=await api.put(urls.saveBillReturn,{billData:returnBill})
-            if(data.resultStatus=="success"){
-                showToast("Bill Saved","success")
-                handleReset();
+        try {
+            const { data } = await api.put(urls.saveBillReturn, { billData: returnBill })
+            if (data.resultStatus == "success") {
+                showToast("Bill Saved", "success")
             }
-            else{
-                showToast("Failed to save","error")
+            else {
+                showToast("Failed to save", "error")
             }
         }
-        catch(err){
-            showToast("Failed to save","error")
+        catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed to save", "error")
         }
-      }
+        finally{
+            handleReset();
+        }
+    }
 
 
     const handleReset = () => {
-        setStockData([]);
-        setLabour(0);
-        setIndustry(0);
-        setConsumables(0);
-        setTechnician('');
-        setBilledBy('');
-        setPaymentMode(1);
-        setLathework(0);
-        setReceivedAmount(0);
         setKart([]);
         setReturnKart([]);
-        setCustomer('');
         setInvoiceNo('');
     }
 
@@ -252,7 +216,6 @@ const BillReturn = () => {
                 </Table>
             </TableContainer>
             <Grid container size={{ md: 12, lg: 12 }} direction={"row"} alignItems={"center"} justifyContent={"center"}>
-
                 <Button
                     type="button"
                     variant="contained"

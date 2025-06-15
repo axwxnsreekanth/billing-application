@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import {
-    Box, Typography, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, FormControl, FormControlLabel
+    Box,  Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell,  FormControlLabel
     , TableBody, Checkbox
 } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField, CustomPriceTextField, CustomTextFieldWithSearch } from '../components'
+import { CustomDropDown, CustomFormLabel, CustomTextField,  CustomTextFieldWithSearch } from '../components'
 import { ItemPopup } from "../components";
 import api from "../services/api";
 import urls from "../services/urls";
 import { useToast } from "../components/Popup/ToastProvider";
 import { ConfirmDialog } from "../components";
+import { useAuth } from "../context/authContext";
 const StockEdit = () => {
     const { showToast } = useToast();
+    const { logout } = useAuth();
     const [open, setOpen] = useState(false);
     const [itemName, setItemName] = useState('');
     const [itemID, setItemID] = useState(0);
@@ -39,7 +41,7 @@ const StockEdit = () => {
         setItemName(item.Item)
         setItemID(item.ItemID);
         setOpen(false);
-       
+
     }
     useEffect(() => {
         getCategoryList();
@@ -55,7 +57,10 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-           showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
     }
 
@@ -77,7 +82,10 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
     };
 
@@ -94,6 +102,9 @@ const StockEdit = () => {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
         }
     }
 
@@ -115,7 +126,9 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-
+            if (err.response.status == 403) {
+                logout();
+            }
         }
     }
 
@@ -157,7 +170,10 @@ const StockEdit = () => {
             setPartNumber(details[0].PartNumber);
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
     }
 
@@ -200,7 +216,10 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
     }
 
@@ -217,7 +236,10 @@ const StockEdit = () => {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
         finally {
             setOpenDialog(false);
@@ -258,6 +280,9 @@ const StockEdit = () => {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Soemthing went wrong", "error")
         }
     }
@@ -297,6 +322,9 @@ const StockEdit = () => {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Something went wrong", "error")
         }
     }
@@ -326,7 +354,7 @@ const StockEdit = () => {
                 }}
             >
                 <Grid container direction={"row"} spacing={2}  >
-                    <Grid container size={{xs:12,sm:12, md: 6, lg: 6 }} alignItems={"center"}>
+                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 6 }} alignItems={"center"}>
                         <Grid item>
                             <CustomFormLabel text={"Barcode"} />
                         </Grid>
@@ -335,7 +363,7 @@ const StockEdit = () => {
                                 handleChange={(e) => setBarCodeSearch(e.target.value)} handleSearch={handleBarcodeSearch} />
                         </Grid>
                     </Grid>
-                    <Grid container size={{xs:12,sm:12, md: 6, lg: 6 }} alignItems={"center"}>
+                    <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 6 }} alignItems={"center"}>
                         <Grid item>
                             <CustomFormLabel text={"PartNumber"} />
                         </Grid>
@@ -373,16 +401,16 @@ const StockEdit = () => {
                     </Grid>
 
                     <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 2 }} alignItems={"center"} justifyContent={"center"}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={isUniversalChecked}
-                                        onChange={handleCheckboxChange}
-                                        name="singleCheckbox"
-                                    />
-                                }
-                                label="Universal"
-                            />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={isUniversalChecked}
+                                    onChange={handleCheckboxChange}
+                                    name="singleCheckbox"
+                                />
+                            }
+                            label="Universal"
+                        />
                     </Grid>
                     <Grid container size={{ xs: 12, sm: 12, md: 6, lg: 4 }} alignItems={"center"}>
                         <CustomFormLabel text={"Make"} />

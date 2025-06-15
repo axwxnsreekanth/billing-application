@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, TableBody, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField } from '../components'
+import {  CustomFormLabel, CustomTextField } from '../components'
 import api from "../services/api";
 import urls from "../services/urls";
 import { InputDialog } from "../components";
@@ -10,8 +10,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
 import { InfoDialog } from "../components";
+import { useAuth } from "../context/authContext";
 
 function CategoryScreen() {
+    const { logout } = useAuth();
     const { showToast } = useToast();
     const [categoryList, setCategoryList] = useState([]);
     const [category, setCategory] = useState('');
@@ -50,6 +52,9 @@ function CategoryScreen() {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Error Occured", "error")
         }
     };
@@ -72,7 +77,10 @@ function CategoryScreen() {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
         finally {
             setOpenDialog(false);
@@ -91,7 +99,10 @@ function CategoryScreen() {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
     }
     useEffect(() => {

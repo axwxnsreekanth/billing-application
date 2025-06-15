@@ -14,7 +14,6 @@ const config = {
   }
 };
 
-console.log('MSSQL config:', config);
 
 const poolPromise = new sql.ConnectionPool(config)
   .connect()

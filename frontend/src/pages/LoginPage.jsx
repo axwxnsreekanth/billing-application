@@ -10,11 +10,12 @@ import {
 } from '@mui/material';
 import api from "../services/api";
 import { useAuth } from '../context/authContext';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import loginPic from '../assets/login-bg.jpg';
 
 const Login = () => {
     const { login } = useAuth();
-     const navigate = useNavigate();
+    const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -29,9 +30,9 @@ const Login = () => {
                 password,
             });
             const { token } = res.data;
-            console.log("token",token)
+            console.log("token", token)
             login(token); // set token and mark as authenticated
-              navigate('/dashboard', { replace: true });
+            navigate('/dashboard', { replace: true });
             // optionally update the path using your custom router
             // navigate('/dashboard'); if you're using router.navigate
         } catch (err) {
@@ -45,13 +46,18 @@ const Login = () => {
             display="flex"
             justifyContent="center"
             alignItems="center"
-            minHeight="100vh"
+            height="100vh"
             bgcolor="#f5f5f5"
+            width={"100vw"}
+            sx={{
+                backgroundImage: `url(${loginPic})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+            }}
         >
-            <Paper elevation={3} sx={{ padding: 4, width: 350 }}>
-                <Typography variant="h5" gutterBottom textAlign="center">
-                    Login
-                </Typography>
+            <Paper elevation={3} sx={{ padding: 4, width: 350,height:250 }}>
+           
 
                 {error && <Alert severity="error">{error}</Alert>}
 

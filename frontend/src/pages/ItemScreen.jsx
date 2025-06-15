@@ -10,8 +10,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
 import { InfoDialog } from "../components";
+import { useAuth } from "../context/authContext";
 
 function ItemScreen() {
+    const { logout } = useAuth();
     const { showToast } = useToast();
     const [itemList, setItemList] = useState([]);
     const [itemName, setItemName] = useState("");
@@ -24,7 +26,7 @@ function ItemScreen() {
     const [newCategoryID, setNewCategoryID] = useState(0);
     const [editID, setEditID] = useState(0);
     const [deleteID, setDeleteID] = useState(0);
-      const [openInfoDialog, setOpenInfoDialog] = useState(false);
+    const [openInfoDialog, setOpenInfoDialog] = useState(false);
     useEffect(() => {
         getCategoryList();
 
@@ -49,6 +51,9 @@ function ItemScreen() {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
         }
     }
 
@@ -60,7 +65,9 @@ function ItemScreen() {
             }
         }
         catch (err) {
-
+            if (err.response.status == 403) {
+                logout();
+            }
         }
     }
 
@@ -92,6 +99,9 @@ function ItemScreen() {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Error Occured", "error")
         }
     };
@@ -131,7 +141,10 @@ function ItemScreen() {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
         finally {
             setOpenDialog(false);

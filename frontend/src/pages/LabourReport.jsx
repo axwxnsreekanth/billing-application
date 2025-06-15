@@ -1,25 +1,17 @@
-import React from "react";
-import { Box, Typography, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, Paper, IconButton, Collapse, TableBody } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField, CustomDateField } from '../components'
+import { Box, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, Paper, TableBody } from "@mui/material";
+import { CustomFormLabel, CustomDateField } from '../components'
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import urls from "../services/urls";
 import { useToast } from "../components/Popup/ToastProvider";
-
-
-
+import { useAuth } from "../context/authContext";
 
 function LabourReport() {
+    const { logout } = useAuth();
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const [dataList, setDataList] = useState([]);
     const { showToast } = useToast();
-    const paymentModes = [
-        { id: 0, description: "All" }, { id: 1, description: "Cash" }, { id: 2, description: "UPI" }
-    ]
-    const [paymentMode, setPaymentMode] = useState(0);
-
-
     useEffect(() => {
         const fetchDate = async () => {
             const today = new Date();
@@ -42,12 +34,14 @@ function LabourReport() {
         }
         try {
             const { data } = await api.get(`${urls.getLabourReports}?dateFrom=${dateFrom}&dateTo=${dateTo}`);
-            console.log("dataaa", data)
             if (data.resultStatus === 'success') {
                 setDataList(data.data)
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Failed,Something went wrong", "error");
         }
     }
@@ -100,7 +94,7 @@ function LabourReport() {
                         >Show</Button>
                     </Grid>
                 </Grid>
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
                     <Table>
                         <TableHead sx={{ backgroundColor: '#F9F9F9' }}>
                             <TableRow>
@@ -119,7 +113,7 @@ function LabourReport() {
                                 ) :
                                     dataList.map((row, index) => (
                                         <TableRow key={index}>
-                                            <TableCell>{index+1}</TableCell>
+                                            <TableCell>{index + 1}</TableCell>
                                             <TableCell>{row.TECHNICIAN}</TableCell>
                                             <TableCell>{row.LABOUR}</TableCell>
                                             <TableCell>{new Date(row.BILLDATE).toLocaleDateString('en-IN')}</TableCell>

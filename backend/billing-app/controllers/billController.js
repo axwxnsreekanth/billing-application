@@ -123,12 +123,14 @@ exports.getBillReport = async (req, res) => {
 
     // Extract raw JSON string (usually in the "" column key)
     const rawJson = result.recordset?.[0]?.BillReportsJson || '[]';
+    const totalReceived = result.recordset?.[0]?.TotalReceivedAmount || 0;
     // Convert to real JS array
     const parsed = JSON.parse(rawJson);
 
     res.status(200).json({
       resultStatus: 'success',
-      data: parsed
+      data: parsed,
+      total:totalReceived
     });
   } catch (err) {
     console.error(err);

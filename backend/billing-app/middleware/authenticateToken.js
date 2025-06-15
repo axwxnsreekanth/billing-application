@@ -5,7 +5,7 @@ const { poolPromise, sql } = require('../config/db');
 
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; 
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) return res.status(401).json({ message: 'No token provided' });
 
@@ -15,7 +15,7 @@ const authenticateToken = async (req, res, next) => {
     const pool = await poolPromise;
     const result = await pool.request()
       .input('token', sql.NVarChar, token)
-      .query('SELECT * FROM Tokens WHERE Token = @token AND IsRevoked = 0 AND Expiry > GETDATE()');
+      .query('SELECT * FROM Tokens WHERE Token = @token AND IsRevoked = 0');
 
     if (result.recordset.length === 0) {
       return res.status(403).json({ message: 'Token invalid or revoked' });

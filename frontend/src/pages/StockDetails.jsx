@@ -1,21 +1,19 @@
-
 import { Box, TableBody, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField } from '../components'
+import {  CustomFormLabel, CustomTextField } from '../components'
 import api from "../services/api";
 import urls from "../services/urls";
 import { useState, useEffect } from "react";
 import { useToast } from "../components/Popup/ToastProvider";
-
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { CircularLoader } from "../components";
+import { useAuth } from "../context/authContext";
 
 function StockDetails() {
     const { showToast } = useToast();
+    const { logout } = useAuth();
     const [stockList, setStockList] = useState([])
-
     const [itemName, setItemName] = useState('');
-
     const [loading, setLoading] = useState(true);
 
     const getAllStock = async () => {
@@ -23,11 +21,13 @@ function StockDetails() {
         try {
             const { data } = await api.get(`${urls.getStockDetailsForExport}?itemName=${itemName}`)
             if (data.resultStatus === 'success') {
-                console.log(data)
                 setStockList(data.data)
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Failed,Something went wrong", "error");
         }
         finally {

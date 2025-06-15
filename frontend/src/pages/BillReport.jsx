@@ -1,16 +1,15 @@
 import React from "react";
-import { Box, Typography, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, Paper, IconButton, Collapse, TableBody } from "@mui/material";
-import { CustomDropDown, CustomFormLabel, CustomTextField, CustomDateField } from '../components'
+import { Box, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, Paper, IconButton, Collapse, TableBody, Typography } from "@mui/material";
+import { CustomDropDown, CustomFormLabel, CustomDateField } from '../components'
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import urls from "../services/urls";
 import { useToast } from "../components/Popup/ToastProvider";
 import { KeyboardArrowDown, KeyboardArrowUp, Delete as DeleteIcon } from '@mui/icons-material';
-
+import { useAuth } from "../context/authContext";
 
 const ExpandableRow = ({ row }) => {
     const [open, setOpen] = useState(false);
-
     return (
         <>
             <TableRow >
@@ -63,6 +62,7 @@ const ExpandableRow = ({ row }) => {
 };
 
 function BillReport() {
+    const { logout } = useAuth();
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const [dataList, setDataList] = useState([]);
@@ -71,7 +71,7 @@ function BillReport() {
         { id: 0, description: "All" }, { id: 1, description: "Cash" }, { id: 2, description: "UPI" }
     ]
     const [paymentMode, setPaymentMode] = useState(0);
-
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         const fetchDate = async () => {
@@ -89,17 +89,21 @@ function BillReport() {
 
 
     const getbillingReports = async () => {
-        if(dateFrom>dateTo){
-            showToast("Invalid Date Selection","error")
+        if (dateFrom > dateTo) {
+            showToast("Invalid Date Selection", "error")
             return;
         }
         try {
             const { data } = await api.get(`${urls.getBillReports}?dateFrom=${dateFrom}&dateTo=${dateTo}&paymentMode=${paymentMode}`);
             if (data.resultStatus === 'success') {
                 setDataList(data.data)
+                setTotal(data.total);
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Failed,Something went wrong", "error");
         }
     }
@@ -158,7 +162,15 @@ function BillReport() {
                         >Show</Button>
                     </Grid>
                 </Grid>
-                <TableContainer component={Paper}>
+                <Grid container size={{ xs: 12, sm: 12, md: 12, lg: 12 }} mb={1} justifyContent={"center"}>
+
+                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                            Total Collection: ₹{total}
+                        </Typography>
+                    </Box>
+                </Grid>
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
                     <Table>
                         <TableHead sx={{ backgroundColor: '#F9F9F9' }}>
                             <TableRow>

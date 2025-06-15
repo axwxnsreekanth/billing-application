@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import {
-    Box, Typography, Grid, Button, TableContainer, Table, TableRow, TableHead, TableCell, FormControl, FormControlLabel
-    , RadioGroup, Checkbox
+    Box, Grid, Button, FormControlLabel
+    , Checkbox
 } from "@mui/material";
 import { CustomDropDown, CustomFormLabel, CustomTextField, CustomPriceTextField, CustomQuantityTextField } from '../components'
 import { ItemPopup } from "../components";
 import api from "../services/api";
 import urls from "../services/urls";
 import { useToast } from "../components/Popup/ToastProvider";
+import { useAuth } from "../context/authContext";
 const StockEntry = () => {
     const { showToast } = useToast();
+    const { logout } = useAuth();
     const [open, setOpen] = useState(false);
     const [itemName, setItemName] = useState('');
     const [itemID, setItemID] = useState(0);
@@ -42,17 +44,16 @@ const StockEntry = () => {
 
     const getItems = async () => {
         try {
-            console.log("item",itemName)
             const { data } = await api.get(`${urls.getAllItems}?itemName=${itemName}&categoryID=${categoryID}`)
-            console.log(`${urls.getAllItems}?item=${itemName}&categoryID=${categoryID}`)
             if (data.resultStatus == 'success') {
                 setItemList(data.data);
-                console.log("itemsssssss",data.data)
                 setOpen(true)
             }
         }
         catch (err) {
-
+            if (err.response.status == 403) {
+                logout();
+            }
         }
     }
 
@@ -74,7 +75,10 @@ const StockEntry = () => {
             }
         }
         catch (err) {
-            showToast("Failed,Something went wrong","error");
+            if (err.response.status == 403) {
+                logout();
+            }
+            showToast("Failed,Something went wrong", "error");
         }
     };
 
@@ -91,6 +95,9 @@ const StockEntry = () => {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
         }
     }
 
@@ -112,7 +119,9 @@ const StockEntry = () => {
             }
         }
         catch (err) {
-
+            if (err.response.status == 403) {
+                logout();
+            }
         }
     }
 
@@ -179,8 +188,11 @@ const StockEntry = () => {
             }
         }
         catch (err) {
+            if (err.response.status == 403) {
+                logout();
+            }
             showToast("Error Occured", "error")
-         
+
         }
 
     }
