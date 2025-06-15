@@ -1,13 +1,20 @@
 const cors = require('cors'); 
 require('dotenv').config();
 const express = require('express');
-
-const app = express();
+const authenticateToken = require('./middleware/authenticateToken'); // ✅ JWT middleware
 const port = process.env.PORT || 3001;
+const app = express();
+
 
 app.use(express.json());
 app.use(cors()); 
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/auth', require('./routes/authRoutes'));
+
+// ✅ Protect ALL routes globally
+app.use(authenticateToken);
+
 // Load routes
 const makeRoutes = require('./routes/makeRoutes');
 app.use('/makes', makeRoutes);
@@ -29,6 +36,9 @@ app.use('/bill', billRoutes);
 
 const dashboardRoutes = require('./routes/dashboardRoutes');
 app.use('/dashboard', dashboardRoutes);
+
+// ✅ Add login route (public, before the global auth above in real setup)
+// app.use('/auth', require('./routes/authRoutes')); // define this to allow login
 
 // Optional: centralized error handling
 // const errorHandler = require('./middlewares/errorHandler');

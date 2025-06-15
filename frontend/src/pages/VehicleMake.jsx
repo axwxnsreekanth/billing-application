@@ -11,8 +11,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ConfirmDialog } from "../components";
 import { InfoDialog } from "../components";
+import { useAuth } from "../context/authContext";
 
 function VehicleMake() {
+    const {logout}=useAuth();
     const { showToast } = useToast();
     const [makeList, setMakeList] = useState([])
     const [make, setMake] = useState('');
@@ -96,6 +98,9 @@ function VehicleMake() {
             }
         }
         catch (err) {
+            if(err.response.status==403){
+                logout();
+            }
             showToast("Failed,Something went wrong","error");
         }
     }
